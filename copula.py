@@ -12,64 +12,66 @@ from itertools import combinations
 
 
 class vcopula():
-    def __init__(self, locationmatrix, predictionmatrix):
+    def __init__(self, locationmatrix, predictionmatrix_all):
         self.L = locationmatrix # n*n matrix with distances between location i and j
-        self.X = predictionmatrix # p*p matrix with distances between predictor values 
+        self.X_alldays = predictionmatrix_all #array with T sets of n*n matrix with distances between predictor values, T=nb of days 
 
 
-    def simulate(self, n=50, sigma=1, p = [1,1], v= [1,1], k=1, m=1):
-        Sigma = self.MaternKernel(self.X, sigma, p, v)
-        Y = np.random.multivariate_normal(mean=np.zeros(shape=(self.X.shape[0],)), cov=Sigma, size=n)
+    def simulate(self,X, n=50, sigma=1, p = [1,1], v= [1,1], k=1, m=1):
+        #simulates n realisations for a single day
+        L=self.L
+        Sigma = self.MaternKernel(L,X, sigma, p, v)
+        Y = np.random.multivariate_normal(mean=np.zeros(shape=(X.shape[0],)), cov=Sigma, size=n)
         # V-transformation of MVN samples
         Z = np.multiply((m-Y),(Y < m)) + np.multiply(k*(Y-m),(1-(Y < m)))
+        # Take V-transformed Zs to Us
+        H1 = lambda z: scs.norm.cdf( (z/2)+3 )-scs.norm.cdf(3-z)
+        for idx,sample in enumerate(Z):    
+            Z[idx]=[H1(val) for val in sample]
         return(Z)
 
     def negloglikelihood(self, theta, U):
+        #U is m sets of vectors of 49=N us, one u for each location: U=[ [u_1 1:49],[u_2 1:49],...,[u_m 1:49] ] - U needs to be [[],[],..]
         sigma=1
         p=[1,1]
         v=[1,1]
         k=theta[0]
         m=theta[1]
-        Sigma = self.MaternKernel(self.L,self.X, sigma, p, v)
-        N = U.shape[1] 
-        # All [0,1] tuples of size N
-        Iters = [np.reshape(np.array(i), (N,)) for i in itertools.product([0, 1], repeat=N)]
-        # Define b function
+        N = len(U[0])
         b_function = lambda x: (-1) * (x < 0) + (1 / k) * (1 - (x < 0))
-        b_Iters =  [[b_function(pow(-1,Iters[y][x])) for x in range(N)] for y in range(len(Iters))]
         # Define H1 taking Z to U - will be used to find H1 inverse in order to take U to Z.
-        Hinv = lambda z: scs.norm.cdf( (z/k)+m )-scs.norm.cdf(m-z)
-        # Compute constants dependent on Sigma
-        const = 0.5*np.log(np.linalg.det(Sigma)) -(N/2)*np.log(2*np.pi)
-        LogLikelihood = 0
-        for ind in range(U.shape[0]):
-            #Apply H1 inverse to U in order to use the densities
-            Z_ind = [inversefunc(Hinv,y_values=val) for val in U[ind,:]]
+        H1 = lambda z: scs.norm.cdf( (z/k)+m )-scs.norm.cdf(m-z)
+        for day,us in enumerate(U):
+            Sigma = self.MaternKernel(self.L,self.X_alldays[day], sigma, p, v)
+            # All [0,1] tuples of size N
+            Iters = [np.reshape(np.array(i), (N,)) for i in itertools.product([0, 1], repeat=N)]
+            b_Iters =  [[b_function(pow(-1,Iters[y][x])) for x in range(N)] for y in range(len(Iters))]
+            # Compute constants dependent on Sigma
+            const = 0.5*np.log(np.linalg.det(Sigma)) -(N/2)*np.log(2*np.pi)
+            LogLikelihood = 0
             # Compute loglikelihood for one iid observation
-            etaplusm = [np.multiply(b_Iters[x],Z_ind) + m for x in range(len(b_Iters))]
-            # Joint density: h_n(x 1:n)
-            LogLikelihood += const + np.log(np.sum([(1/(pow(k,(N-sum(Iters[x]))))) * np.exp(-0.5*(np.sum(np.multiply(etaplusm[x],
-                                np.dot(np.linalg.inv(Sigma),etaplusm[x]))))) for x in range(len(Iters))]))
-            # Log of products of marginal densities: h(x1)*h(x2)*...*h(xn)
-            LogLikelihood -= np.sum([ np.log((1/k)*scs.norm.pdf((x_i/k)+m) + scs.norm.pdf(m-x_i)) for x_i in Z_ind ])
-
-        return -LogLikelihood
+            temp_logsum=0
+            for b_it in b_Iters:
+                temp_logsum+=np.log( (1/(pow(k,(N-sum(b_it))))) *np.exp(  np.array([b_it[n]*us[n] for n in range(N)]).dot(np.transpose(np.array([b_it[n]*us[n] for n in range(N)]).dot(np.linalg.inv(Sigma))))  ))
+            LogLikelihood+=const+temp_logsum[0][0]
+        return(-LogLikelihood)
 
     def ExpQuadKernel(self, X, sigma, l):
         return (sigma**2) * np.exp(- X * (1/(2*np.power(l,2))))
     
     def MaternKernel(self,L,X,sigma, p, v):
+        #returns a matrix where each entry is the respective kernel for that location. This is used for a single day.
         p0 = p[0]
         p1 = p[1]
         v0 = v[0]
         v1 = v[1]
         # Locations kernel
         out1 = np.multiply( (sigma**2) * ( ((2)**(1-v0)) / (gamma(v0)) ) * (L**v0) * ((sqrt(2*v0)/p0)**2) , kv(v0, L*(sqrt(2*v0)/p0)) ) 
-        for row_col in range(self.L.shape[0]):
+        for row_col in range(L.shape[0]):
             out1[row_col][row_col]=1
         # Predictor kernel
         out2 = np.multiply( ((2)**(1-v1)) / (gamma(v1))  * (X**v1) * ((sqrt(2*v1)/p1)**2) , kv(v1, X*(sqrt(2*v1)/p1))) 
-        for row_col in range(self.X.shape[0]):
+        for row_col in range(X.shape[0]):
             out2[row_col][row_col]=1
         return np.multiply(out1,out2)
 '''
@@ -131,12 +133,9 @@ loc_distmatrix=np.array([[0.0, 20.71654842910133, 8.395798672490209, 12.18087925
 21.43327704650249, 35.64397948155176, 28.976641197613052, 29.30977135669916, 38.48577239829147, 35.119191673528164, 
 34.02454799603367, 30.837761851694946, 38.1956249112724, 26.46455666812734, 26.69931395368955, 38.78479149784264, 33.4223430783546, 26.023712803850866, 32.882152104320085, 30.101959268299996, 29.95507172398459, 27.062483922593742, 35.03883384879433, 25.960900022581164, 33.7057023370014, 36.695760412095616, 26.245566075326092, 36.47490332823047, 53.09396007345525, 23.897530215861355, 34.00935750151475, 35.59475589691889, 2.208509759535409, 2.2587974545040397, 26.853402136564192, 30.141778365762807, 32.223487287703996, 6.626351948583177, 36.11638438007589, 36.07956882623282, 
 34.99305696803314, 34.02025563022114, 18.143813406026783, 32.28566099280441, 1.887772067506382, 30.20871644897958, 33.383904254621406, 0.0, 35.79558654695847, 21.907964487906703], [12.304236676763756, 33.01570145808181, 4.308558497836181, 20.111550091122115, 0.562991016189676, 7.701530265127326, 7.011314199741729, 7.274156634244394, 18.23765215634566, 1.9939467867528358, 5.844605789153612, 4.687070160428599, 10.233645160253303, 29.74105229937696, 6.899023679695031, 9.17900382271676, 27.303461226041584, 7.952798871909435, 6.831103699121304, 6.87328937347978, 8.734641508187817, 5.0731868617354605, 10.668235491288078, 2.391923840424356, 1.7463561958296163, 9.644603775184487, 1.326651646184332, 17.89750900006999, 11.900034262261853, 2.0387415428477293, 0.7023002890078915, 35.1204534921279, 35.01444831114408, 10.083306460836384, 6.800047798083913, 5.311197819301669, 29.285473853201974, 0.6545936373367672, 0.5679316059249635, 15.704004173132997, 2.058970096966376, 21.838281491795502, 3.5930657757307425, 34.16732378333338, 6.675357005375115, 9.173560403640334, 35.79558654695847, 0.0, 14.433290436941745], [4.129055180280314, 19.324060816483346, 11.209223119035752, 8.05856105553911, 14.174803579378054, 9.48547249976479, 9.301209115085983, 16.62227086329071, 16.850600705604215, 12.941755145081537, 9.01403229465938, 16.313224894520825, 8.062744285347, 19.671802540303343, 16.89459485591352, 15.709589312308676, 17.345887539364114, 14.528435772110342, 10.486797509338556, 10.293340817411453, 6.115080583521956, 13.130916532205683, 7.716378306736488, 12.707664823373301, 15.05270137526204, 6.1905667883549835, 14.888679476633957, 31.2089752516403, 3.9232273460833462, 12.945606516483654, 14.101506228377733, 20.978384822054842, 20.870893102559062, 8.59644246047277, 10.521252427982429, 12.35017305092345, 15.285595400191397, 14.633942781500926, 14.612589960602, 15.575835971074568, 12.972713118479172, 8.236421850338585, 11.24591540373868, 20.44637593205643, 10.516343719751422, 15.671497178811673, 21.907964487906703, 14.433290436941745, 0.0]])
-print(loc_distmatrix.reshape(49,49))
-print(loc_distmatrix[0][48])
-print(loc_distmatrix[48][0])
-
-
-
+loc_distmatrix=loc_distmatrix.reshape(49,49)
+for pog in range(30):
+    print(vcopula(locationmatrix=loc_distmatrix,predictionmatrix_all=np.array([loc_distmatrix for i in range(5)])).negloglikelihood(theta=[1,1],U=np.array([[np.array([pog/30 for one in range(49)])] for two in range(5)])))
 
 '''
 # Consider 7 points to create locations
@@ -157,7 +156,7 @@ for ind1 in range(n_points):
 #test=np.array([scs.uniform.rvs(size=7)for i in range(5)])
 #print(vcopula(X,X).negloglikelihood(U=test,theta=[5,1]))
 
-#print(vcopula(X).MaternKernel(X,1,1,1))
+#print(vcopula(loc_distmatrix,loc_distmatrix).MaternKernel(loc_distmatrix,loc_distmatrix,1,[1,1],[1,1]))
 
 #Testing mle
 '''#bounds=Bounds([0.04,-10,0.05,-10],[10,10,10,10]) #bounds on theta parameters as [-sig,-l,-k,-m],[sig,l,k,m]
@@ -179,3 +178,4 @@ print(np.mean(k_estimates))
 print(m_estimates)
 print(np.mean(m_estimates))'''
     
+#scipy dual anealing for copula optimisation
