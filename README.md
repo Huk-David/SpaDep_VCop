@@ -1,5 +1,9 @@
 # Spatial dependency structure learning with copulas.
 
+This repository contains my work on spatial dependency copula estimations done for my dissertation and the resulting paper (to be submited to AISTATS, link to paper hopefully soon). To use the code, only what is inside the 'essentials' folder is needed.
+
+
+
 Based largely on the following:
 
 [1]Bárdossy, A.: Interpolation of groundwater quality parameters with some values below the detection limit, Hydrol. Earth Syst. Sci., 15, 2763–2775, https://doi.org/10.5194/hess-15-2763-2011, 2011
