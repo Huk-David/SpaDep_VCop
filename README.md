@@ -1,6 +1,6 @@
 # Spatial dependency structure learning with copulas.
 
-This repository contains my work on spatial dependency copula estimations done for my dissertation and the resulting paper (to be submited to AISTATS, link to paper hopefully soon). To use the code, only what is inside the 'essentials' folder is needed.
+This repository contains my work on spatial dependency copula estimations done for my dissertation and the resulting paper (link hopefully soon). To use the code, only what is inside the 'essentials' folder is needed.
 
 
 
