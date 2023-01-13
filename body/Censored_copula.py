@@ -76,20 +76,32 @@ class truncgauss():
         '''
         self.L=L
     
-    def sim(self,theta,inv_us,draws,day_idx,kernel='rbf'):
+    def sim(self,theta,inv_us,draws,day_idx,kernel='rbf',method='multiply',rvs=None,give_rvs=None):
         '''
         Simulates m draws from the truncated gaussian copula conditional on parameters theta for the covariance kernel.
         '''
-        # Generate mvn with Sigma, then truncate according to p_i
-        n = len(self.L)
-        if kernel =='rbf':
-            cov_mat = rbf(self.L,gamma=theta)
-        elif kernel == 'Matern':
-            cov_mat = Matern(length_scale=theta[0],nu=theta[1]).__call__(self.L)
-        rvs = scs.multivariate_normal.rvs(np.zeros(n),cov_mat,size=draws)
+        if rvs==None:
+            # Generate mvn with cov_mat, then censor according to p_i
+            n = len(self.L)
+            # covariance matrix based on kernel
+            if method=='multiply':
+                if kernel =='rbf':
+                    cov_mat = rbf(self.L,gamma=theta)
+                elif kernel == 'Matern':
+                    cov_mat = Matern(length_scale=theta[0],nu=theta[1]).__call__(self.L)
+            elif method=='add':
+                if kernel =='rbf':
+                    cov_mat = rbf(self.L,gamma=theta)
+                elif kernel == 'Matern':
+                    cov_mat = Matern(length_scale=theta[0],nu=theta[1]).__call__(self.L)
+            # n draws of corresponding normal values
+            rvs = scs.multivariate_normal.rvs(np.zeros(n),cov_mat,size=draws)
+            if give_rvs!=None:
+                return rvs
 
-        return [[ scs.norm.cdf(max([rvs[i][j],-inv_us[day_idx][j]])) for j in range(n)] for i in range(draws)]
-
+        # turn into cdf values, and censor based on inv_u
+        return  [[ scs.norm.cdf(max(rvs[i][j],-inv_us[day_idx][j])) for j in range(n)] for i in range(draws)]
+    
     def nll_Matern(self,theta,Invcdf_Us,truncation_pi,did_rain,len_locs):
             cov_mat = np.nan_to_num(Matern(length_scale=theta[0],nu=theta[1]).__call__(self.L))
             nll=0
