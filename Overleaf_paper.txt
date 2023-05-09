@@ -1,0 +1,1119 @@
+%% Template for the submission to:
+%%   The Annals of Applied Statistics [AOAS]
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% In this template, the places where you   %%
+%% need to fill in your information are     %%
+%% indicated by '???'.                      %%
+%%                                          %%
+%% Please do not use \input{...} to include %%
+%% other tex files. Submit your LaTeX       %%
+%% manuscript as one .tex document.         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[aoas]{imsart}
+
+%% Packages
+\RequirePackage{amsthm,amsmath,amsfonts,amssymb}
+\RequirePackage[authoryear]{natbib}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{comment}
+%\usepackage[tight,footnotesize]{subfigure}
+\RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{dsfont}
+\usepackage{booktabs}
+\usepackage{bigstrut}
+
+\startlocaldefs
+
+\newcommand{\matr}[1]{\mathsf{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% Uncomment next line to change            %%
+%% the type of equation numbering           %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\numberwithin{equation}{section}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% For Axiom, Claim, Corollary, Hypothesis, %%
+%% Lemma, Theorem, Proposition              %%
+%% use \theoremstyle{plain}                 %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+%\newtheorem{???}{???}
+%\newtheorem*{???}{???}
+%\newtheorem{???}{???}[???]
+%\newtheorem{???}[???]{???}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% For Assumption, Definition, Example,     %%
+%% Notation, Property, Remark, Fact         %%
+%% use \theoremstyle{remark}                %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{remark}
+\newtheorem{definition}{Definition}[section]
+%\newtheorem{???}{???}
+%\newtheorem*{???}{???}
+%\newtheorem{???}{???}[???]
+%\newtheorem{???}[???]{???}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Please put your definitions here:        %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\endlocaldefs
+
+\begin{document}
+
+\begin{frontmatter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                          %%
+%% Enter the title of your article here     %%
+%%                                          %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Censored Copulas for Zero-Inflated data\\ via Scoring Rule minimisation}
+%\title{A sample article title with some additional note\thanksref{T1}}
+\runtitle{Censored Copulas via Scoring Rule minimisation}
+%\thankstext{T1}{A sample of additional note to the title.}
+
+\begin{aug}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Only one address is permitted per author. %%
+%% Only division, organization and e-mail is %%
+%% included in the address.                  %%
+%% Additional information can be included in %%
+%% the Acknowledgments section if necessary. %%
+%% ORCID can be inserted by command:         %%
+%% \orcid{0000-0000-0000-0000}               %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{\fnms{David}~\snm{Huk}},
+\author{\fnms{Rilwan A.}~\snm{Adewoyin}}
+\and
+\author{\fnms{Ritabrata}~\snm{Dutta}\ead[label=]{???@???}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Addresses                                %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\address{University of Warwick}
+
+\end{aug}
+
+\begin{abstract}
+abstract...
+\end{abstract}
+
+\begin{keyword}
+\kwd{Zero-inflated}
+\kwd{Spatio-temporal}
+\kwd{Copulas}
+\kwd{Scoring rules}
+\kwd{Rainfall forecasts}
+\kwd{Simulation-based inference}
+\end{keyword}
+
+\end{frontmatter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Please use \tableofcontents for articles %%
+%% with 50 pages and more                   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Main text entry area:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+
+Across the globe, society is becoming increasingly prone to extreme precipitation events due to climate change. The United Nations stated that flooding was the most dominant weather-related disaster over the 20 years leading up to 2015, affecting 2.3 billion people and accounting for \$1.89 trillion in reported economic losses as reported in \cite{paper2}. Policy makers are increasingly relying on large numerical weather
+predictors, called Climate Models (CMs), to prepare for the increased monetary and societal risk posed by extreme precipitation. These CMs are used to simulate model fields (weather variables) in to the future and work well for most weather variables. However, previous research has found that
+CMs routinely under-predict extreme precipitation events as shown in \cite{paper3}, \cite{paper4} and \cite{paper5}. This problem is also experienced by Deep Learning approaches such as the works of \cite{paper6}, \cite{paper7}, \cite{paper8}. To address this poor simulation of extreme precipitation it is common to predict a distribution for rainfall as opposed to simply predicting the expected value, which will be biased towards the more frequently observed case of low rainfall events.\par
+
+In this work, we propose a novel two-component probabilistic model for forecasting and downscaling rainfall. The first component is a newly developed 
+ Generalised Neural Model used for learning location-specific marginal distributions. The second component is a censored copula approach tailored for zero-inflated data, inducing spatial dependency into the forecasts. When used in conjunction, these two components predict spatially and temporally coherent joint densities of rainfall.
+Lastly, we apply our model to a large UK rainfall dataset and compare it's performance with benchmark methods.
+\par
+
+Since our methodological work is motivated by an applied problem, let us first briefly introduce the problem in question - rainfall forecasting.
+
+The rest of this paper is organised as follows. In section 2 we present the UK rainfall dataset we use. In section 3, we describe our methodology. Section 4 presents Generalised Neural Models as a method for learning distributions. Section 5 details how copulas can be used together with marginal distributions to learn a spatial dependency structure for censored data. Section 6 examines and displays results of censored Gaussian copulas fitted together with the JGNM marginal distributions to the rainfall dataset. The paper ends with a discussion in section 7.
+
+% Maybe emphasise how the censored copula is an easy extension from an already existing marginal model to make it spatial. A lot of people during the Vienna conference were in this situation, so there could be value in explicitly saying that we address this problem.
+
+\section{Data and statistical problem}
+In this section, we begin by providing a description of the data, followed by an explanation of our statistical problem and approach.
+
+\subsection{Model data}
+Our model aims to use forecasts of weather variables from the ERA5 reanalysis dataset \cite{ERA5} to predict a joint distribution of rainfall across multiple locations as given by the E-OBS rainfall data \cite{E_obs}. \par
+
+Formally, at 6-hourly intervals $j\in \{1,2,3,4\}$ of day $t\in \mathcal{T} \subset \mathbb{N}$ for locations $i\in \{1,\ldots,n\}=\mathcal{I}$, we are given predictors $\boldsymbol{\mathcal{X}}_{i,jt} = (\mathcal{X}_{i,jt}^{(1)},\ldots,\mathcal{X}_{i,jt}^{(6)} )$ aggregated into daily predictors $\boldsymbol{\mathcal{X}}_{i,t}=(\boldsymbol{\mathcal{X}}_{i,1t},\boldsymbol{\mathcal{X}}_{i,2t},\boldsymbol{\mathcal{X}}_{i,3t},\boldsymbol{\mathcal{X}}_{i,4t})$ representing 6 weather variables from the ERA5 data \cite{ERA5}, namely specific humidity, air temperature, geopotential height (500 hPa), longitudinal and latitudinal components of wind velocity (850 hPa),  and total column water vapour in the entire vertical column. These variables are measured over 40 years from the start of 1979 to July 2019, characterising our set of days $\mathcal{T}$. The measurements are done at approximately 65km spatial resolution on an initial ($20 {\times} 21$) grid representing the UK, which we interpolate into a finer ($100 \times 140$) grid at approximately 8.5 km spatial resolution, in turn characterising $\mathcal{I}$. This interpolation is needed to match the resolution of our outcome variables $\boldsymbol{\mathcal{Y}}_{t}=(y_{1,t},\ldots,y_{n,t})$ reporting observed rainfall in millimeters, coming from  the  E-OBS rainfall dataset \cite{E_obs}. These precipitation measurements are done daily for the same days in $\mathcal{T}$ and at the same locations $\mathcal{I}$ as the interpolated $\boldsymbol{\mathcal{X}}_{i,t}$.\par
+Thus, our task is to perform statistical \emph{downscaling} of rain, that is predicting high resolution precipitation from low resolution weather variables. By conditioning on forecasts of future weather varibales, our model gains in reach due to the accuracy of CM weather forecasts on longer-time frames compared to statistical models directly predicting weather. However, as this accuracy does not translate to rainfall and the resolution is fairly low, a need arises for a model capable of translating forecasted spatially coarse weather states to fine precipitation predictions. Furthermore, one would like to have uncertainty quantification about possible rainfall levels over $\mathcal{I}$ in order to assess various precipitation-related risks, which is not possible with point forecasts, motivating our model to be \emph{probabilistic} - forecasting entire distributions.
+
+\begin{comment}
+    
+[THIS WHOLE DESCRIPTION NEEDS REWRITING TO INTRODUCE weather variables $\boldsymbol{\mathcal{X}}_{i,t} = (\mathcal{X}_{i,t}^{(1)},\ldots,\mathcal{X}_{i,t}^{(6)}  )$ at times $t\in \mathbb{Z}$ and location indices $i$ from the set $\mathcal{I} =\{1,\ldots,n\} $ of locations and RAINFALLS WRITE KEEPING IN MIND, WE DESCRIBE THE n Locations, 6 weather variables, what are the range of time t [1979 to 2019-07] etc. THEN EXPLAIN DOWNSCALING AND WHY WE NEED TO DO ... COMING TO WHY WE NEED PROBABILISTIC FORECAST OF RAINFALL.]
+We make use of two datasets, namely the ERA5 reanalysis dataset \cite{ERA5} and the E-OBS rainfall dataset \cite{E_obs}. The ERA5 reanalysis dataset \cite{ERA5} is an analogue for CM outputs which we in-turn use as inputs for our model. The reanalysis data, giving by 6-hourly intervals from STARTyear to ENDyear, is based on a weather forecast model – that is running at a similar resolution to a CM – to which observations are constantly assimilated to yield estimates of the weather state. With these historical weather state estimates we aim to predict the high resolution precipitation observations which are made available by the E-OBS rainfall dataset \cite{E_obs}. This second dataset of daily measurements spanning STARTyear to ENDyear is created from the observational records of a network of weather stations. In order to get an estimate for precipitation at points on a structured geographic grid, E-OBS uses a pre-trained spatial correlation function. Generally, E-Obs is a high quality dataset, having been found to have strong correlation with the highest quality UK precipitation data \cite{paper4}.\par
+% What is the START-END period we have data from?
+Our input data contains the following 6 weather variables : specific humidity, air temperature, geopotential height (500 hPa), longitudinal and latitudinal components of wind velocity (850 hPa),  and total column water vapour in the entire vertical column. Each weather variable is defined for a ($20 {\times} 21$) grid representing the UK at approximately 65km spatial resolution, which matches the grid used in UK Climate Projections datasets \citep{Murphy2018}. By stacking together the six model fields, as in Fig. 1, we have a ($20 {\times} 21 {\times} 6$) matrix $X_{t,j}, j \in \{1,\ldots,4\}$, representing UK weather states at 6-h intervals. Our model will therefore take as input a sequence of daily model field observations $X_t \in \mathbb{R}^{4 \times 20 \times 21 \times 6}$, from which it will output a probabilistic prediction for the true daily total 
+precipitation $(mm), Y_t \in \mathbb{R}^{100\times140}$, defined on a ($100 \times 140$) grid over the UK with approximately 8.5 km spatial resolution, depicted in Figure 1. These predictions will be matched against the E-OBS data which has identical resolution. As such this task requires spatial upscaling and temporal downscaling. 
+
+[SUMMARIZE ABOVE BY BRIEFLY DESCRIBING WHAT IS DATA AND WHAT IS THE GOAL.]
+% Not sure of there are too many references to our model in the data subsection. Maybe we should strictly just talk about the data? On the other hand, I like referencing the model as it re-enforces the motivation for our approach.
+\end{comment}
+
+\begin{comment}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/Pictures from Akanni/training_regions_higlighted.png}
+    \caption{NOT A RELEVANT FIGURE, REMOVE OR FIND SOMETHING RELEVANT.}
+\end{figure}
+\end{comment}  
+\subsection*{Statistical problem}
+
+Our goal is to forecast rainfall over the UK while conditioning on weather predictions. We are presented with predictors in the form of weather variables $\boldsymbol{\mathcal{X}}_{i,t}$ for days $t\in \mathcal{T}$ and location indices $i$ from the set $\mathcal{I}$ of locations considered. As we want to provide a probabilistic forecast at a future time $s\in\mathcal{T}$ for rainfall $\boldsymbol{\mathcal{Y}}_{s}=(y_{1,s},\ldots,y_{n,s})$ simultaneously over all locations in $\mathcal{I}$, we need to construct a conditional joint distribution of rainfall over the $n$ locations at time $s$, written $\mathbb{P}(\boldsymbol{\mathcal{Y}_{s}}|
+\boldsymbol{\mathcal{H}}_s)$, conditioning on the history of predictor variables until time $s$ denoted as $ \boldsymbol{\mathcal{H}}_s \equiv \{ \boldsymbol{\mathcal{X}}_{i,t} : i\in \mathcal{I} \text{ and } t\leq s \}$. 
+
+Since this conditional joint density is hard to estimate in one step, we decompose our approach into two sub-parts using Sklar's theorem \citep{sklar} on copulas, which are multivariate cumulative distribution functions for which the marginal probability distribution of each variable is uniform on the interval $[0, 1]$.
+\begin{comment}
+\begin{theorem}[\cite{sklar}]
+If $\mathbf{G}$ is a n-dimensional distribution function with marginal distributions $G_1,G_2,...,G_n$, then there exists a copula $\mathbf{C}$ such that  $\forall\hspace{0.1cm}  \mathbf{x}=(x_1,x_2,...,x_n)\in \mathbb{R}^n$:\\
+$$\mathbf{G}\left(x_{1}, \ldots, x_{n}\right)=\mathbf{C}\left(G_{1}\left(x_{1}\right), \ldots, G_{n}\left(x_{n}\right)\right)$$
+Furthermore, if the multivariate distribution function has a probability density function $\mathbf{g}$ that is available, it holds that:\\ 
+\begin{equation}
+    \mathbf{g}\left(x_{1}, \ldots, x_{n}\right)=g_{1}\left(x_{1}\right)\cdot\ldots\cdot g_{n}\left(x_{n}\right)
+\cdot\mathbf{c}\left(G_{1}\left(x_{1}\right), \ldots, G_{n}\left(x_{n}\right)\right)  
+\end{equation}
+where $\mathbf{c}$ is the density of the copula and $g_{1}\left(x_{1}\right)\cdot\ldots\cdot g_{n}\left(x_{n}\right)$ are the marginal densities.
+\end{theorem}
+\end{comment}
+Sklar's theorem links the marginal and the joint PDFs together through the copula density for random variables in $\mathbb{R}^n$, providing a means of getting information about one of these quantities by knowing the other two. But we notice that the observed rainfall $y_{i,t}$ are not continuous random variables, indeed 
+%With rainfall as our quantity of interest $y_{i,t}$, we have that 
+$y_{i,t}\geq0$ meaning it is restricted to $\mathbb{R}_{\geq0}$ the positive real line including zero. Furthermore, a rainfall value for a dry day translates to a zero-valued observation making our observations a case of \emph{zero-inflated data}, in which there is an over-representation of zero-valued data points. 
+
+Hence, to utilize the Sklar's theorem for modelling the joint distribution of rainfall, we consider our observations $\boldsymbol{\mathcal{Y}}_{s}$ being censored observations of a latent continuous variable $\boldsymbol{\mathcal{Y}}_{s}^{*} \in \mathbb{R}^n$ where
+\begin{equation*}
+    y_{i,s}=\begin{cases}y_{i,s}^{*}, & \text{if $y_{i,s}^{*}>0$ }\\
+                        0, & \text{if $y_{i,s}^{*}. \leq0$}\end{cases}
+\end{equation*}
+The marginal continuous densities of $\boldsymbol{\mathcal{Y}}_{s}^{*}$ are $f_i^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s) ,\, i \in \mathcal{I}$ (with distributions $F_i^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s)$) at location $i \in \mathcal{I}$ and the dependence between them can be modelled by an unique coupla $\mathbf{c}^{*}\left(F_1^{*}(y_{1,s}^{*}|\boldsymbol{\mathcal{H}}_s),\ldots, F_n^{*}(y_{n,s}^{*}|\boldsymbol{\mathcal{H}}_s)|\boldsymbol{\mathcal{H}}_s, \mathcal{D}\right)$ given $\boldsymbol{\mathcal{H}}_s$ and $\mathcal{D}$ being a $n\times n$ matrix of spatial information for locations in $\mathcal{I}$. Hence the Sklar's theorem provides us with, 
+\begin{equation*}  \mathbb{P}\left(\boldsymbol{\mathcal{Y}}_{s}^{*}|\boldsymbol{\mathcal{H}}_s\right)=
+   f_{1}^{*}\left(y^{*}_{1,s}|\boldsymbol{\mathcal{H}}_s\right) \cdot \ldots \cdot f^{*}_{n}\left(y^{*}_{n,s}|\boldsymbol{\mathcal{H}}_s\right)
+   \cdot    \mathbf{c}^{*}\left(F^{*}_{1}\left(y^{*}_{1,s}|\boldsymbol{\mathcal{H}}_s\right), \ldots, F^{*}_{n}\left((y^{*}_{n,s}|\boldsymbol{\mathcal{H}}_s\right)|\boldsymbol{\mathcal{H}}_s, \mathcal{D}\right). 
+\end{equation*}
+
+We consider $f_i$ and $F_i$ are respectively the conditional marginal density and conditional marginal cumulative distribution function of rainfall at location $i$ given $\boldsymbol{\mathcal{H}}_s$, which corresponds to $f^{*}_i$ and $F^{*}_i$ censored  at $0$, specifically,
+
+\begin{equation*}
+    f_{i}\left(y_{i,s}|\boldsymbol{\mathcal{H}}_s\right)
+    =\begin{cases}
+    f^{*}_{i}\left(y^{*}_{i,s}|\boldsymbol{\mathcal{H}}_s\right), & \text{if $y_{i,s}>0$ }\\
+    F^{*}_{i}\left(0|\boldsymbol{\mathcal{H}}_s\right), & \text{if $y_{i,s} = 0$}.
+    \end{cases}
+\end{equation*}
+and 
+\begin{equation*}
+    F_{i}\left(y_{i,s}|\boldsymbol{\mathcal{H}}_s\right)
+    =\begin{cases}
+    F^{*}_{i}\left(y^{*}_{i,s}|\boldsymbol{\mathcal{H}}_s\right), & \text{if $y_{i,s}>0$ }\\
+    p_{i,s} = F^{*}_{i}\left(0|\boldsymbol{\mathcal{H}}_s\right), & \text{if $y_{i,s} = 0$}.
+    \end{cases}
+\end{equation*}
+To model the joint distribution of rainfall, we decide  to model the marginal densities $f_i$ (and equivalently distributions $F_i$) directly 
+\begin{comment}
+in the first part, while modelling the copula density $\mathbf{c}$ in a second part.
+[HERE c should depend on s, then say that we remove that dependence for simplicity and then intuitively discuss why that is a reasonable assumption. EXPLAIN HOW c WOULD DEPEND ON TOPOLOGY CONDITIONALLY AND n LOCATIONS ... SPATIAL COPULA!
+In Section~\ref{sec:marginal_deep}, we will develop a model for marginal distributions $F_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$. 
+Deciding to model these particularities of the rainfall data explicitly, we admit a
+\end{comment}
+by using known distributions of zero-inflated data, e.g.
+mixture model with mass at $\{0\}$ and a continuous parametric density for $y_{i,t}>0$ [CITE] or a compound Poisson distribution [CITE]. To make marginal densities $f_i$ conditional on $\boldsymbol{\mathcal{H}}_s$, we develop the so-called Joined Generalised Neural Model which transform CM predictors $\boldsymbol{\mathcal{H}}_s$ to informative summaries via a function parametrized by a neural network (NN) architecture and use these summaries as predictors in a joint generalized linear model (JGLM) framework to estimate the parameters of the marginal densities. This initial transformation of predictors to summaries, serves to extract non-linear trends of the data, more specifically the temporal and spatial dependency structure are captured through specific NN architectures, utilising LSTMs and ConvNets correspondingly. We would call this as joint generalized neural model, which serves to estimates parameters for our marginal densities $f_{i}$ for each of the locations in $\mathcal{I}$, and are trained 
+by minimising the negative log-likelihood of $f_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$. The description of JGNM and inference of them are described in Section~\ref{sec:marginal_deep}.
+
+\begin{comment}
+which would not be captured by regular GLMs while estimating the parameters with joint GLMs allows us to optimise the whole JGNM 
+by minimising the log-likelihood of $f_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$. Furthermore, to capture the spatio-temporal biases we make use of specific NN architectures, utilising LSTMs and ConvNets for time and space dependencies respectively. 
+As such, the JGNM serves to estimates parameters for our marginal densities $f_{i}$ while capturing the spatio-temporal information relevant to the given location $i$.
+[NEED REWRITING] The particularities of rainfall data are multiple. Firstly, taking rain as quantity of interest $y_{i,t}$, we have that $y_{i,t}\geq0$ and so is restricted to $\mathbb{R}_{\geq0}$ the positive real line including zero. As rainfall value for a dry day translates to a zero-valued observation, rainfall data is a prime example of what is known as \emph{zero-inflated data}, in which type of dataset there occurs an over-representation of zero-valued data points. Hence rainfall data calls for a modelling approach able to take into account discrete zero-valued observations as well as accurately model observations in $\mathbb{R}_{>0}$.
+....... Give details of what we would do in Section~\ref{sec:marginal_deep}.
+
+In Section~\ref{sec:cens_copula}, we will model the spatial dependency between locations by considering $\mathbf{c}$ to be a censored latent Gaussian copula. Due to the mixture-model specification of our marginal densities causing them to be discontinuous, we need to assume a slightly modified set-up for Skalr's theorem to hold. 
+
+
+Critically, we consider our observations $\boldsymbol{\mathcal{Y}}_{s}$ to be a censored version of latent variables $\boldsymbol{\mathcal{Y}}_{s}^{*}$ coming from unknown continuous densities $f_i^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s) ,\, i \in \mathcal{I}$ (with distributions $F_i^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s)$) whose dependence can now be modelled with a classical Gaussian copula. That is, we assume that
+\begin{equation}
+    y_{i,s}=\begin{cases}y_{i,s}^{*}, & \text{if $y_{i,s}^{*}>0$ }\\
+                        0, & \text{if $y_{i,s}^{*} \leq0$}\end{cases}
+\end{equation} 
+\end{comment}
+
+The copula for the latent continuous variables 
+$\boldsymbol{\mathcal{Y}}_{s}^{*}$, are assumed to be a Gaussian copula of the form 
+\begin{eqnarray*}
+    \mathbf{c}^{*}\left(F_1^{*}(y_{1,s}^{*}|\boldsymbol{\mathcal{H}}_s),\ldots, F_1^{*}(y_{1,s}^{*}|\boldsymbol{\mathcal{H}}_s)|\boldsymbol{\mathcal{H}}_s, \mathcal{D}\right) &=&
+\mathbf{c}^{*}\left(\Phi(x_{1,s}^{*}),\ldots,\Phi(x_{n,s}^{*})|\boldsymbol{\mathcal{H}}_s, \mathcal{D}\right)
+\\
+&= &    \frac{\phi_n\left(x_{1,s}^{*},\ldots,x_{n,s}^{*}|\mathbf{0},\Sigma(\boldsymbol{\mathcal{H}}_s,\mathcal{D})\right)}
+        {\prod_{i=1}^{n}\phi(x_{i,s}^{*})}
+\end{eqnarray*}
+where $x_{i,s}^{*}=\Phi^{-1}\left(F_{i}^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s)\right)$, $\phi$ and $\Phi$ are the pdf and cdf of univariate Gaussian distribution, and $\phi_n$ a Gaussian multivariate density with mean $\mathbf{0}$ and covariance matrix $\Sigma(\mathcal{\boldsymbol{\mathcal{H}_s},D})$. 
+%The dependency of the 
+Through the modeling of the 
+covariance matrix we can enforce different types of spatial depepndence between all the locations based on their distances between them or similarity to their topological features.
+%on the spatial information $\mathcal{D}$ and history $\boldsymbol{\mathcal{H}}_s$ is unknown and needs to be estimated. 
+%The details of the parametric modeling of covariance matrix and inference of these parameters from the rainfall data are provided in Section~\ref{sec:cens_copula}. 
+Evaluation of the likelihood of the observed rainfall values using latent copula density is computationally expensive due to censoring as it needs high dimensional integration over censored locations, thereby rendering maximum likelihood estimation (MLE) impractical. Consequently, we propose a novel estimation methodology based on Scoring Rules which does not rely on the likelihood. Our proposed method only relies on generated samples from the latent copula which can be obtained very efficiently due to our assumption of Gaussianity. We present this methodology along with the latent censored copula in Section~\ref{sec:cens_copula}.
+
+%Additionally, the variables $x_{i,s}^{*} \,,i\in\mathcal{I}$ are monotonous and continuous transformations of observed rainfall $y_{i,s}^{*}$ to a Gaussian scale as $x_{i,s}^{*}=\Phi^{-1}\left(F_{i}^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s)\right)$.
+
+\begin{comment}
+(maybe say that the covariance matrix does not change across time, is not too much sensitive to changes due to s but mostly just sensitive to space+topology). With respect to rinfall, the levels are already time dependent through marginals and so the missing piece is only the spatial coherence. One could (and we will in concluding remarks) consider an extension where relative levels/dependence varies with time, but this requires estimating a different parameter for each time, which is too costly with our approach, as we only have to estimate the covariance once for the given choice of marginals.
+
+
+[NEED REWRITING] [CLARIFY HERE THAT C needs to be spatial copula inducing dependency between n locations. WE further assume that the c is not dependent on s meaning the dependency structure among locations are independent of the history.] The form for both these models has to take into account the application to the data at hand. 
+NOTE SKLARS theorem holds for continuous random variables on real line .... so we need different types of copula. Give details of what we would do in Section~\ref{sec:cens_copula}.
+
+
+
+%\subsection{Particularities of rainfall data}
+%As is the case for most statistical applications, there is no magic formula that always provides a perfect solution. Rather, it is the data which dictates the approach to be taken. \par
+ 
+%This is frequently the case in examples such as the number of health clinic visits in a period by patients, or the number of car accidents for a given person. However, these are examples of counting data, whereas rainfall is a continuous measurement.\par 
+%This distinction leads us to our third point. Rainfall over a period of time such as a day, can theoretically achieve any positive value. Thus, it only seems natural to model $y_{i,t}$ with the use of continuous random variables. The problem with such an assumption is that rainfall can also never occur in a day, which then 
+
+    Therefore an appropriate distribution for rainfall needs to accommodate the following:
+\begin{enumerate}
+  \item The support of the distribution, or equivalently, the forecasted values need to be non-negative.
+  \item The chosen distribution has to be capable of accurately modelling zero-inflated observations.
+  \item The distribution needs to have a point-mass probability given to zero-valued observations as well as a density over positive amounts.
+\end{enumerate}
+
+
+
+\subsection{Sampling rainfall without the joint density} 
+The end goal of our model is to learn the joint density $\mathcal{M}$ which respect the temporal as well as spatial structure of the data. We will motivate our approach to do so by considering the problem from the end.\par
+Remember that our goal is to learn the joint cumulative distribution function (CDF) over a set of locations for a given day. Assuming that we have a way of getting samples from the corresponding joint probability distribution function (PDF), we could simply sample from the PDF repeatedly and construct an empirical CDF. Under this assumption, our problem reduces to finding a way to sample from the joint PDF.\par
+Furthermore, using the property that for a value $u=F(x) \in [0,1]$ of a marginal CDF it holds that
+\begin{equation}
+    F^{-1}\left(u\right)=F^{-1}\left(F\left(x\right)\right)=x,
+\end{equation}
+we could get realisations from the joint PDF by using equation (\hyperlink{eq2.3}{2.4}) on a vector $\mathbf{u}=(u_1,u_2,...,u_n) \in [0,1]^n$ corresponding to marginal CDF realisations, were we to have access to one. This implies that if we manage to simulate realisations $\mathbf{u}$ from the joint CDF, we can use (\hyperlink{eq2.3}{2.4}) to get realisations from the joint PDF, which finally allows us to construct an empirical distribution.\par
+This may sound confusing, as we are using realisations from the CDF in a twisted way to in the end construct an empirical version of the CDF - the same object we just sampled from. The reason for doing this is that on it's own, a value in $[0,1]$ does not tell us anything about the rain. We need a way of relating $\mathbf{u}$ to rainfall, which is what the procedure we just described does. \par
+While this gives us a way of constructing a joint distribution, notice some pieces are still missing. Indeed, we implied that we know the form of the inverse marginal CDFs for our rainfall amounts. Moreover, we need to sample $\mathbf{u}$ in such a way that it respects the dependency structure of the joint distribution of rainfall. Thus, we have two tasks ahead. \\  Firstly, we need to learn the marginal distributions for each location in order to take inverses of them. Secondly, we have to learn the copula density which captures the dependency structure, in order to sample $\mathbf{u}$ from it. \\
+\end{comment}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Modeling marginals using joint generalized neural model}
+\label{sec:marginal_deep}
+
+
+In this section, we will describe our model for the conditional marginal densities $f_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$ and their respective distributions $F_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$. As we will evaluate the distributions repeatedly for a large amount of realisations in Section~\ref{sec:cens_copula}, we decide to make our model for marginals be parametric for efficient evaluations. Previous works have considered multiple parametric models for rainfall, such as mixture gamma \citep{das1955fitting,holsclaw2017bayesian,xie2023assessment}, mixture log-normal \citep{shimizu1993bivariate,bhakar2008probablity,yosboonruang2022bayesian} and Compound-Poisson (CP) \citep{revfeim1984initial, dunn2004occurrence, altman2023statistical} densities. We will consider all three of these, presenting them in the following.\par
+%densities
+
+% maybe add more detail to these descriptions?
+\paragraph*{Zero-gamma mixture}
+The first is a mixture giving explicit mass at $\{0\}$ and accounting for positive realisations via a gamma density. For our observed rainfall $y_{i,s},\,i\in\mathcal{I},\,s\in\mathcal{T}$, we assume it follows the marginal density
+\begin{equation}
+\begin{aligned}
+    f_{i}(y_{i,s}|\boldsymbol{\mathcal{H}}_s)&=\mathcal{P}(y_{i,s} ; p_{i,s},\mu_{i,s}, \phi_{i,s})\\
+    &=
+    \left[1-p_{i,s}\right] \cdot\delta_{0}\left(y_{i,s}\right)+p_{i,s} \cdot\left(\frac{y_{i,s}}{\phi_{i,s} \mu_{i,s}}\right)^{1 / \phi_{i,s}} \frac{1}{y_i} \exp \left(-\frac{y_i}{\phi_{i,s} \mu_{i,s}}\right) \frac{1}{\Gamma(1 / \phi_{i,s})}
+\end{aligned}
+\end{equation}
+where $\delta_{0}(.)$ is the Dirac mass measure at 0, $p_{i,s} \in [0,1]$ is the probability of positive rain and with $\mu_{i,s}>0$ and $\phi_{i,s}>0$ symbolising the mean and standard deviation respectively. The dependence on location $i$ and time $s$ in the parameters $p_{i,s},\mu_{i,s},\phi_{i,s}$ indicates that their estimation is location-specific and conditional on the history $\boldsymbol{\mathcal{H}}_s$. \par
+
+\paragraph*{Zero-lognormal mixture}
+For the Log-normal distribution, we assume that our response variable $y_{i,s}$ has a PDF of the form
+\begin{equation}
+\begin{aligned}
+    f_{i}(y_{i,s}|\boldsymbol{\mathcal{H}}_s)&=\mathcal{P}(y_{i,s} ; p_{i,s}, \mu_{i,s}, \phi_{i,s})\\
+    &=\left[1-p_{i,s}\right] \cdot \delta_{0}\left(y_{i,s}\right)+p_{i,s} \cdot\frac{1}{y_{i,s} \phi \sqrt{2 \pi}} \exp \left(-\frac{(\ln (y_{i,s})-\mu_{i,s})^{2}}{2 \phi^{2}}\right)
+\end{aligned}
+\end{equation}
+where $\mu_{i,s}$ and $\phi_{i,s}$ are the mean and standard deviation respectively, which along with $p_{i,s}$ again dependent on the location $i$ and history $\boldsymbol{\mathcal{H}}_s$.
+\par
+
+\paragraph*{Compound-Poisson}
+In a CP model, one first defines a latent variable $Z \sim$ Poisson $(\lambda)$ for $\lambda \in \mathbb{R}_{>0}$ as well as i.i.d. latent variables $U_{i}$ for $i=1,2,3,...$ and assumes that 
+$Y \mid Z=\sum_{i=1}^{Z} U_{i}$. The probability density function of $Y$ can be obtained by marginalising the joint PDF as such:
+\begin{equation}
+    p_{Y}(y)=\sum_{z=0}^{\infty} p_{Y \mid Z}(y \mid z) \mathbb{P}(Z=z) \quad \text { for } y \geqslant 0.
+\end{equation}
+If, in addition, we assume that $U_{i} \sim \operatorname{Gamma}(\alpha, \beta)$ with $\alpha>0$ the gamma shape parameter and $\beta>0$ the  rate parameter, it can be shown that $Y \mid Z \sim \operatorname{Gamma}(Z \alpha, \beta)$. In such a case, $Y \sim \operatorname{CP}(\lambda, \alpha, \beta)$, the compound Poisson distribution, sometimes called compound Poisson-Gamma, is part of the exponential family for known $\alpha$ \citep{jorgensen1987exponential}. To make this apparent, one can do a change of parameterisation with:
+\begin{equation}
+  p=\frac{2+\alpha}{1+\alpha}
+  \ ,
+\end{equation}
+\begin{equation}
+  \mu=\frac{\lambda\alpha}{\beta}
+  \ ,
+\end{equation}
+\begin{equation}
+  \phi = \frac{\alpha+1}{\beta^{2-p}(\lambda\alpha)^{p-1}}
+  \ .
+\end{equation} In our set-up of conditional density on location $i$ and time $s$, this leads to a likelihood of the form
+\begin{equation}
+    \begin{aligned}
+    f_{i}(y_{i,s}|\boldsymbol{\mathcal{H}}_s)&=\mathcal{P}(y_{i,s} ;p_{i,s}, \mu_{i,s}, \phi_{i,s})\\
+    &= \begin{cases}\exp\left[
+      -\frac{\mu_{i,s}^{2-p_{i,s}}}{\phi_{i,s}(2-p_{i,s})}
+  \right] & \text { for } y_{i,s}=0 \\
+  \vspace{0.5cm} 
+  \exp\left[
+    \frac{1}{\phi_{i,s}}
+    \left(
+      y\frac{\mu_{i,s}^{1-p_{i,s}}}{1-p_{i,s}}-\frac{\mu_{i,s}^{2-p_{i,s}}}{2-p_{i,s}}
+    \right)
+  \right]
+  \frac{1}{y_{i,s}}
+  \sum_{z=1}^{\infty}W_z(y_{i,s},p_{i,s},\phi_{i,s}) & \text { for } y_{i,s}>0\end{cases}.
+\end{aligned}
+\end{equation}
+where
+\begin{equation}
+      W_z(y_{i,s},p_{i,s},\phi_{i,s})=\frac{y_{i,s}^{z\alpha}}{\phi_{i,s}^{z(1+\alpha)}(p_{i,s}-1)^{z\alpha}(2-p_{i,s})^z z!\Gamma(z\alpha)} \, , \alpha=\frac{2-p_{i,s}}{1-p_{i,s}}.
+      \end{equation}
+[With the presence of an infinite sum in $z$ in the likelihood of the CP, one needs to come up with an efficient way of evaluating it. We did-....- as is detailed in the appendix -.-].
+\par
+the setup of conditioning -> glms -> etc
+
+%models
+The gamma, lognormal and CP (although CP only under certain specifications) are part of the exponential dispersion family \citep{jorgensen1987exponential}, allowing us to model them using Generalised Linear Models (GLMs). Taking weather variables as inputs of GLMs to forecast rainfall at specific locations has been done successfully in \cite{little2009generalized}. Indeed it is an effective and reliable way of conditioning on predictors in order to estimate a distribution for the outcome variable. The GLM formulation is as follows.\par
+\paragraph*{Generalised Linear Models}
+For a given response vector $\boldsymbol y=(y_1,y_2,...,y_n)^{T}\in \mathbb{R}^{n}$ of $n$ independent observations assumed to come from the same exponential dispersion family, one can write their probability function as
+\begin{equation}
+    \mathcal{P}(y_i ; \theta, \phi_i)=a(y_i, \phi_{i}) \exp \left\{\frac{y \theta-\kappa(\theta)}{\phi_i}\right\}, i\in \{1,2,...,n\}
+\end{equation}
+where $\theta$ is the \emph{canonical parameter}, $\phi_i > 0$ the \emph{dispersion parameter} for observation $i$, $a(y, \phi)$ a normalizing function and $\kappa(\theta)$ the known \emph{cumulant function}. For such a response $\boldsymbol y$ and an adequate choice of \emph{link function }$g(.)$, a GLM assumes that , $g(\eta_i) =g\left(\mathbb{E}\left[y_{i}\right]\right)$ admits linear predictors
+$$g(\eta_i)=\beta_{0}+\boldsymbol{\beta}^{\top} \boldsymbol{x}_{i}=\beta_{0}+\left\langle\boldsymbol{\beta}, \boldsymbol{x}_{i}\right\rangle$$
+with $\boldsymbol{x}_{i} \in \mathbb{R}^{p}$ the predictors, $\boldsymbol\beta=(\beta_1,\beta_2,...,\beta_p)^{T}\in \mathbb{R}^{p}$ the vector of corresponding coefficients and $\beta_0 \in \mathbb{R}$ being the intercept. Such a form of probability function allows for useful results \cite{Dunn_glm} such as
+\begin{equation}
+    \mathrm{E}[y_i]=:\mu=\frac{\mathrm{d} \kappa(\theta)}{\mathrm{d} \theta} \quad \text { and } \quad \operatorname{var}[y_i]=\phi_{i} \frac{\mathrm{d}^{2} \kappa(\theta)}{\mathrm{d} \theta^{2}}=\phi_{i} V(\mu)
+\end{equation}, where $V(\mu):=\frac{\mathrm{d} \mu}{\mathrm{d} \theta}$ is defined as the \emph{variance function} which uniquely determines the distribution within  the class of exponential dispersion models. In our case, in order to estimate the time and location specific parameters $(p_{i,s},\mu_{i,s},\phi_{i,s})$ for any given $y_{i,s}$ and a relevant subset of predictors from $\boldsymbol{\mathcal{H}}_s$, one would first fit a logistic regression for occurrence of rain conditional on the subset, followed by a GLM for the mean and dispersion. Then, depending on the model we assume for the GLM, it is only a matter of choosing an appropriate link function, some examples of which are given below with their associated distributional choices and model parameters.
+\begin{table}[h!]
+$$\begin{array}{|l|c|c|c|c|c|}
+\hline \text { distribution } & \text { support } & b(\theta) & \Theta & g(\mu) & \text { link name } \\
+\hline \text { normal } \mathcal{N}(\mu, 1) & \mathbb{R} & \theta^{2} / 2 & \mathbb{R} & \mu & \text { linear } \\
+\text { delta } & \mathbb{R}_{+} & -\log (-\theta) & \mathbb{R}_{-} & -1 / \mu & \text { negative inverse } \\
+\text { Bernoulli } & \{0,1\} & \log \left(1+e^{\theta}\right) & \mathbb{R} & \log (\mu /(1-\mu)) & \text { logit } \\
+\text { binomial } & \{0, \ldots, n\} & n \log \left(1+e^{\theta}\right) & \mathbb{R} & \log (\mu /(n-\mu)) & \text { logit } \\
+\text { Poisson } & \mathbb{N}_{0} & \exp (\theta) & \mathbb{R} & \log (\mu) & \log \\
+\hline
+\end{array}$$
+
+  \caption{Common GLMs with their parameters.}
+\end{table}
+
+A drawback of the traditional GLM is that the dispersion $\phi_{i,s}$ has to be constant across observations, which is most likely not the case for rainfall across time and space. Therefore, one can consider the extended joint GLM (JGLM) which allows for variance in dispersion levels across data. 
+\paragraph*{Joint Generalised Linear Models}
+Introduced in 1991 by Lee and Nedler \cite{JGLM}, JGLMs relax the assumption on $\phi_{i}$ being constant. Whereas in GLMs the dispersion term is usually assumed constant across observations, JGLMs allow $\phi_{i}$ to be modelled via a second GLM, different from the GLM for the mean. This leads to the following:
+\newline
+For observed data $(y_{1},\ldots,y_{n})$, we have the usual GLM for the mean $\eta_{i}$ as
+$$g_1\left(\eta_{i}\right)=\beta_{i}^{(0)}+\left\langle\boldsymbol{\beta}, \boldsymbol{x}_{i}\right\rangle$$
+with $g_1(.)$ as the link function for the mean,  $\boldsymbol{x}_{i} \in \mathbb{R}^{p}$ the predictors, $\boldsymbol\beta\in \mathbb{R}^{p}$ the coefficients and $\beta_0 \in \mathbb{R}$ the intercept. In addition, JGLMs admit a GLM for the dispersion as
+$$g_2(\mathbb{E}[\phi_{i}])=\alpha_{0}+\left\langle\boldsymbol{\alpha}, \boldsymbol{c}_{i}\right\rangle$$
+with $g_2(.)$ the link function, $\alpha_{0}$ the intercept, $\boldsymbol{\alpha}=\{\alpha_1,\alpha_2,...,\alpha_d\} \in \mathbb{R}^{d}$ the coefficients, $d \in \mathbb{N}$ the number of parameters used and $\boldsymbol c_i \in \mathbb{R}^{d}$ the predictors.\par
+
+While a JGNM would finally allow us to have site and time dependent models for marginal densities $f_i(y_{i,s}|\boldsymbol{\mathcal{H}}_s)$, we can still seek improvement in the complexity of the model. Notably, the relationship between predictors and density parameters is linear in the coefficients. As such, non-linear relationships in the modelling of parameters will not be taken into account by the marginals. To remedy this, a further improvement of GLMs can be considered by incorporating Deep Feed-forward Neural Networks (DFNN). (For an introduction of DFNNs, refer to e.g. \cite{Goodfellow})
+
+\paragraph*{Deep Generalised Linear Models}
+Consider the same set-up as with GLMs,where we have a set of predictors $\boldsymbol{x_i}$ with associated outcome variables $y_i$ and a suitable link function $g(.)$. The DeepGLM model by \cite{DGLM} first 'refines' the predictors $\boldsymbol{x_i}$ by training a deep feed-forward neural network to obtain learned features $\boldsymbol{z_i}$ which have the form
+$$\boldsymbol{z_i}=f_{L}\left(\boldsymbol W_{L}. f_{L-1}\left(\boldsymbol W_{L-1}.  \cdots f_{1}\left(\boldsymbol W_{1}.\boldsymbol x_i\right) \cdots\right)\right)$$
+with $L \in \mathbb{N}$ the number of hidden layers in the DFNN, $\boldsymbol W=\{\boldsymbol W_{1},\boldsymbol W_{2},...,\boldsymbol W_{L} \}$ the set of weights at each layer and $f_1,...,f_L$ \emph{activation functions}. These functions transform predictors between layers and are applied component-wise. The learned features $\boldsymbol z_i \in \mathbb{R}^{p_{L}}$ are the last layer of the DFNN and their dimension $p_{L}$ as well as that of the weight matrices depends on the networks architecture. These learned features are then taken as the 'new' linear predictors in the classical GLM model, leading to the form
+$$g(\eta_{i_{\boldsymbol W}})=g\left(\mathbb{E}\left[y_{i}\mid \boldsymbol x_i, \boldsymbol W\right]\right)=\mathfrak{N}(\boldsymbol x_i,\boldsymbol W, \boldsymbol{ \underline \beta})=\beta_{0}+\left\langle\boldsymbol{\beta}, \boldsymbol{z}_{i}\right\rangle $$
+where $\boldsymbol{ \underline \beta}=\{\beta_0,\boldsymbol \beta\}=\{\beta_0,\beta_1,...,\beta_{p_L}\}$ are the coefficients of regression and $g(.)$ the link function.
+
+
+
+
+The conditional marginal densities for rainfall should be from a distribution supported on $\mathbb{R}_{\leq0}$ and having a positive mass at $0$. [CITE PAPERS DEALT this before] ... by assuming a mixture model between a point mass at $\{0\}$ and a continuous density over $\mathbb{R}_{\leq0}$ or using a compound Poisson distribution [CITE] ...
+
+[NOW INTRODUCE MIXTURE DISTRIBUTION - BOTH USING GAMMA AND LOGNORMAL]
+The mixture model can be written as
+$$f\left(y \right)=\left[1-p\right]\cdot \delta_{0}\left(y\right)+p\cdot \,\mathcal{G}\left(y ; \mu, \phi\right),$$
+where $\delta_{0}(.)$ is the Dirac mass measure at 0, $p$ is the probability of positive rain and $\mathcal{G}(.; \mu, \phi)$ is the Gamma density with parameters $ \mu ,  \phi$ both $\in\mathbb{R}_{>0}$. With this mixture model, we extend the support to cover all possible values of rainfall, leaving us with three parameters to estimate in order to fully specify the distribution, namely $p$ as the probability of rain and $(\mu,\phi)$ as the parameters of the Gamma density. We assume a GLM parameterisation for the density as
+$$\mathcal{G}\left(y ; \mu, \phi\right)=\left(\frac{y}{\phi \mu}\right)^{1 / \phi} \frac{1}{y} \exp \left(-\frac{y}{\phi \mu}\right) \frac{1}{\Gamma(1 / \phi)}.$$\\
+
+[INTRODUCE COMPOUND POISSON DISTRIBUTION]
+
+[CONDITIONING ON THE PREDICTOR VARIABLES]
+To derive the conditional marginal densities, we assume that the conditioning predictor variables influence the distribution through their parameters only. (Explain for Gamma mixture, we would assume that the p, mu, sigma are functions of the predictor variables.) 
+
+[EXAPLAIN AND INTRODUCE FIRST GLM, then JGLM, THEN DeepJGLM]. 
+
+[]
+In order for our model to incorporate these assumptions into the training of the parameters, we can specify the GNMs loss function to take the form of the negative log likelihood of the corresponding distribution. This way, the GNM will try to optimise the weights of the NN part and the coefficients of the GLM in a way that reflects our modelling choices.\\
+
+ADD FROM THESIS. 
+Keeping the same set-up for the data as in \hyperlink{1.2}{subsection 3.1.2}, our proposed Generalised Neural Model has two \emph{components models}. The first component models the mean and the second models the dispersion.
+
+For the first component model, consider a DFNN with input variables $\boldsymbol x_i$ and their transformation $\boldsymbol z_{i,1}$ corresponding to the last hidden layer as in \hyperlink{Subsection 1.3}{subsection 3.1.3}. Taking $\boldsymbol z_{i,1}$ as the new predictors, one then fits a GLM to the mean conditional on the weights $\boldsymbol W_{1}$ of the DFNN as well as on the initial predictors $\boldsymbol x_i$, of the form
+$$g_{1}\left(\mathbb{E}\left[y_{i}\mid \boldsymbol x_i, \boldsymbol W_{1}\right]\right)=\mathfrak{N_1}(\boldsymbol x_i,\boldsymbol W_{1}, \boldsymbol{ \underline \beta})=\beta_{0}+\left\langle\boldsymbol{\beta}, \boldsymbol{z}_{i,1}\right\rangle $$
+with $g_1(.)$ the link function for the mean,  $\underline{\boldsymbol \beta}\in \mathbb{R}^{p_{L,1}+1}$ the coefficients of regression as in \hyperlink{Subsection 1.3}{subsection 3.1.3} where $p_{L,1} \in \mathbb{N}$ is the dimension of $\boldsymbol z_{i,1}$ dependent on the structure of the DFNN.
+\newline
+
+For the second component model, we consider a DFNN with input variables $\boldsymbol c_i$ and their transformation $\boldsymbol z_{i,2}$ corresponding to the last hidden layer. Taking  $\boldsymbol z_{i,2}$ as the new predictors, one then fits a GLM to the dispersion parameter $\phi_i$ conditional on the weights $\boldsymbol W_{2}$ of this DFNN as well as on the initial predictors $\boldsymbol c_i$, of the form
+$$g_{2}(\phi_i \mid \boldsymbol c_i, \boldsymbol W_{2})=\mathfrak{N_2}(\boldsymbol c_i,\boldsymbol W_{2}, \boldsymbol{ \underline \alpha})=\alpha_{0}+\left\langle\boldsymbol{\alpha}, \boldsymbol{z}_{i,2}\right\rangle $$
+with $g_2(.)$ the link function for the dispersion,  $\underline{\boldsymbol \alpha}\in \mathbb{R}^{p_{L,2}+1}$ the coefficients of regression where $p_{L,2} \in \mathbb{N}$ is the dimension of $\boldsymbol z_{i,2}$ dependent on the structure of the corresponding DFNN.
+\newline
+
+HOW WOULD YOU GET AN MLE FOR THIS - ADD A PARAGRAPH ON INFERENCE.  
+
+[PUT IN APPENDIX THE DETAILS OF DEEPJGNM FOR LOGNORMAL AND COMPOUND POISSON MODEL]
+
+[PUT THE DETAILS OF NN USED, WHY CONVOLUTIONAL AND WHY LSTM EXPLAIN - AKANNI]
+
+[COMPARISON BETWEEN THESE THREE DIFFERENT MODELS FOR OUR DATA ADD A FIGURE FOR ECDF, CONCLUDE IN 2-3 LINES]
+
+In essence, this model uses the JGLM framework with a model for the mean and another model for the dispersion, but replaces the GLMs with DeepGLMs. Notice that the DFNNs used for each part as well as their link functions and GLM model choices need not be the same. Furthermore, it is important to emphasise that this model can take into account additional parameters by assuming another DGLM model for them. This is something we will take advantage of in the coming section.
+\par
+With such a set-up, we make use of the NN part of the GNM to refine predictors and perform automatic pre-processing of the features, making them better suited for our task. We also take advantage of the GLM part which allows us to map the predictors to suitable values and take appropriate transformations of them with the use of an appropriate link (and inverse-link) functions.\par 
+In addition, notice that GLMs, JGLMS and DeepGLMs are all special cases of our proposed generalized neural model (GNM). In order to get to a DeepGLM, it is enough to assume all $\phi_i$ are constant. To get to a JGLM, one has instead to have both of the DFNN result in linear models with no transformation done to the predictors $\boldsymbol x_i$ and $\boldsymbol c_i$. And finally to get back to a GLM, one has to assume both that $\phi$ is constant and have the DFNNs result in the same predictors taken as inputs. Therefore, theoretically, we expect GNMs to at least match, if not outperform the models presented in \hyperlink{section 3.1}{section 3.1}. 
+
+
+\section{Censored Gaussian Copula}
+\label{sec:cens_copula}
+
+\paragraph{Likelihood ..}
+The latent copula $\mathbf{c}^{*}$ for $\boldsymbol{\mathcal{Y}}_{s}^{*}$ induces a censored copula $\mathbf{c}^{c}$ on observed $\boldsymbol{\mathcal{Y}}_{s}$, by accounting for censored values through integration. 
+
+
+
+
+
+$F^{*}(0) = p_{i,s} \,\in[0,1]$
+
+$d_{i,s} = \Phi^{-1}(p_{i,s})$
+
+
+As the likelihood of 
+
+we define $\mathcal{I}_s^{o}=\{i\in\mathcal{I}: y_{i,s} >0 \}=\{i_1,\ldots,i_k\}\,\subseteq \mathcal{I}$ as the set of locations without censoring and $\mathcal{I}_s^{c}=\{i\in\mathcal{I}:y_{i,s} = 0\}=\{j_1,\ldots,j_l\}=\mathcal{I}\setminus\mathcal{I}_s^{o}$ as the locations with censoring, where $0\leq k,l\leq n$ and $n=k+l$.
+
+
+Hence, 
+\begin{eqnarray*}  \mathbb{P}\left(\boldsymbol{\mathcal{Y}}_{s}|\boldsymbol{\mathcal{H}}_s\right)
+&=& \int^{0}_{-\infty} \ldots \int^{0}_{-\infty}
+\mathbb{P}\left(\boldsymbol{\mathcal{Y}}_{s}^{*}|\boldsymbol{\mathcal{H}}_s\right) dy^{*}_{j1,s} \ldots dy^{*}_{jl,s}\\
+&=& \int^{0}_{-\infty} \ldots \int^{0}_{-\infty}f_{1}^{*}\left(y^{*}_{1,s}|\boldsymbol{\mathcal{H}}_s\right) \cdot \ldots \cdot f^{*}_{n}\left(y^{*}_{n,s}|\boldsymbol{\mathcal{H}}_s\right)\\
+   &&\cdot    \mathbf{c}^{*}\left(F^{*}_{1}\left(y^{*}_{1,s}|\boldsymbol{\mathcal{H}}_s\right), \ldots, F^{*}_{n}\left((y^{*}_{n,s}|\boldsymbol{\mathcal{H}}_s\right)|\boldsymbol{\mathcal{H}}_s, \mathcal{D}\right) dy^{*}_{j1,s} \ldots dy^{*}_{jl,s}\\
+&=&  \int^{0}_{-\infty} \ldots \int^{0}_{-\infty}f_{1}^{*}\left(y^{*}_{1,s}|\boldsymbol{\mathcal{H}}_s\right) \cdot \ldots \cdot f^{*}_{n}\left(y^{*}_{n,s}|\boldsymbol{\mathcal{H}}_s\right)\\  &&\frac{\phi_n\left(x_{1,s}^{*},\ldots,x_{n,s}^{*}|\mathbf{0},\Sigma(\boldsymbol{\mathcal{H}}_s,\mathcal{D})\right)}
+        {\prod_{i=1}^{n}\phi(x_{i,s}^{*})}dy^{*}_{j1,s} \ldots dy^{*}_{jl,s}.
+\end{eqnarray*}
+
+where $x_{i,s}^{*}=\Phi^{-1}\left(F_{i}^{*}(y_{i,s}^{*}|\boldsymbol{\mathcal{H}}_s)\right)$, $\phi$ and $\Phi$ are the pdf and cdf of univariate Gaussian distribution, and $\phi_n$ a Gaussian multivariate density with mean $\mathbf{0}$ and covariance matrix $\Sigma(\mathcal{\boldsymbol{\mathcal{H}_s},D})$. 
+
+EXPLAIN HOW THETA - PARAMETER OF COPULA CAN BE INFERRED BY MAXIMIZING ABOVE LIKELIHOOD. THEN NOTICE THAT THIS IS A VERY HIGH DIMENSIONAL INTEGRATION AND HENCE NOT FEASIBLE TO COMPUTE.
+
+\begin{comment}
+More precisely, for any $i\in\mathcal{I}$, considering censoring levels $p_{i,s}\,\in[0,1]$ for latent $u_{i,s}^{*}:=F(y_{i,s}^{*})$ with their analogues $d_{i,s}$ for $x_{i,s}^{*}$ on the Gaussian scale, we define $\mathcal{I}_s^{o}=\{i\in\mathcal{I}:p_{i,s}<u_{i,s}^{*}\}=\{i\in\mathcal{I}:y_{i,s}=y_{i,s}^{*}\}=\{i_1,\ldots,i_k\}\,\subseteq \mathcal{I}$ as the set of locations without censoring and $\mathcal{I}_s^{c}=\{i\in\mathcal{I}:p_{i,s}\geq u_{i,s}^{*}\}=\{j_1,\ldots,j_l\}=\mathcal{I}\setminus\mathcal{I}_s^{o}$ as the locations with censoring, where $0\leq k,l\leq n$ and $n=k+l$. With these quantities in mind, we can consider the density of the latent censored Gaussian copula $\mathbf{c}^{c}$ by integrating over possible values of censored observations in the density of $\mathbf{c}^{*}$ as follows:
+% in the third line/after second equal sign, when I have c*, maybe I should write it as the random variables taking values U=u instead of simply writing u, since order might matter in the notation for c*?
+
+\begin{equation*}
+    \mathbf{c}^{c}\left( F_{i}(y_{1,s}|\boldsymbol{\mathcal{H}}_s),\ldots,F_{i}(y_{i,s}|\boldsymbol{\mathcal{H}}_s)\right|\boldsymbol{\mathcal{H}}_s,\mathcal{D})
+\end{equation*}
+\begin{equation}
+\begin{aligned}
+    =&\quad \mathbb{P}_{\mathbf{c}^{*}}\left(\{p_{i,s}<\Phi(x_{i,s}^{*}),\,\forall i\in\mathcal{I}^{o}_s\}\cap\{p_{j,s}\geq\Phi(x_{j,s}^{*}),\,\forall j\in\mathcal{I}^{c}_s\}) \right)\\
+    = &\quad \mathbf{c}^{*}\left(u_{i_1,s}^{*},\ldots,u_{i_k,s}, u_{j_1,s}^{*}\in[0, p_{j_1,s} ],\ldots,u_{j_l,s}\in[0, p_{j_l,s} ]\right)\\
+    = &\quad \displaystyle\int_{0}^{\scalebox{1.1}{$d_{j_1,s}$}}\cdots\int_{0}^{\scalebox{1.1}{$d_{j_l,s}$}} \frac{\phi_n\left(x_{1,s}^{*},\ldots,x_{n,s}^{*}|\mathbf{0},\Sigma(\boldsymbol{\mathcal{H}}_s,\mathcal{D})\right)}
+        {\prod_{i=1}^{n}\phi(x_{i,s}^{*})} dx_{j_1,s}\ldots dx_{j_l,s}
+\end{aligned}
+\end{equation}
+
+% the subscripts got hard to read so I slightly increased the size
+
+\begin{equation*}
+    \scalebox{1.1}{$\mathbf{c}^{c}\left( F_{i}(y_{1,s}|\boldsymbol{\mathcal{H}}_s),\ldots,F_{i}(y_{i,s}|\boldsymbol{\mathcal{H}}_s)\right|\boldsymbol{\mathcal{H}}_s,\mathcal{D})$}
+\end{equation*}
+\begin{equation}
+\begin{aligned}
+    =&\quad \scalebox{1.1}{$\mathbb{P}_{\mathbf{c}^{*}}\left(\{p_{i,s}<\Phi(x_{i,s}^{*}),\,\forall i\in\mathcal{I}^{o}_s\}\cap\{p_{j,s}\geq\Phi(x_{j,s}^{*}),\,\forall j\in\mathcal{I}^{c}_s\}) \right)$}\\
+    = &\quad \scalebox{1.1}{$\mathbf{c}^{*}\left(u_{i_1,s}^{*},\ldots,u_{i_k,s}, u_{j_1,s}^{*}\in[0, p_{j_1,s} ],\ldots,u_{j_l,s}\in[0, p_{j_l,s} ]\right)$}\\
+    = &\quad \scalebox{1.1}{$\displaystyle\int_{0}^{\scalebox{1.1}{$d_{j_1,s}$}}\cdots\int_{0}^{\scalebox{1.1}{$d_{j_l,s}$}} \frac{\phi_n\left(x_{1,s}^{*},\ldots,x_{n,s}^{*}|\mathbf{0},\Sigma(\boldsymbol{\mathcal{H}}_s,\mathcal{D})\right)}{\prod_{i=1}^{n}\phi(x_{i,s}^{*})} dx_{j_1,s}\ldots dx_{j_l,s}$}
+\end{aligned}
+\end{equation}
+
+\end{comment}
+
+To simplify the estimation of $\Sigma(\boldsymbol{\mathcal{H}}_s,\mathcal{D})$, we assume that $\mathbf{c}$ depends only on $\mathcal{D}$ and not on $\boldsymbol{\mathcal{H}}_s$, which makes the copula stationary with respect to time $s$. This is reasonable as we already have information about $\boldsymbol{\mathcal{H}}_s$ captured in the marginals $F_{i}$ and so rely solely on spatial information to infer the dependence between locations. In this way, we model the joint \emph{relative} intensity as a function of space, while the exact amounts depend on temporal information through the marginals. This reliance on $\mathcal{D}$ when constructing the censored copula induces the spatial dependence on our observations $\boldsymbol{\mathcal{Y}}_s, \, s\in\mathcal{T}$\par
+
+
+% Cite papers: everythin by Richards/Tawn on spatial extremes. 
+% First censored copula paper? Benoit, L., Allard, D., and Mariethoz, G. (2018). Stochastic rainfall modeling at sub-kilometer scale. Water Resources Research, 54(6):4108–4130
+% Censored Gaussian copula: 'Continuous Spatial Process Models for Spatial Extreme Values' and 'Strong Dependence of Extreme Convective Precipitation Intensities on Gauge Network Density'
+% Truncated copula, has the latent copula idea: Phylogenetically informed Bayesian truncated copula graphical models for microbial association networks
+% Likelihood estimators for multivariate extremes, This has as fourth case the exact censoring of copula we use. @misc{huser2015likelihood,      title={Likelihood estimators for multivariate extremes},       author={Raphaël Huser and Anthony C. Davison and Marc G. Genton},      year={2015},      eprint={1411.3448},      archivePrefix={arXiv},      primaryClass={stat.ME}}
+%Bridging asymptotic independence and dependence in spatial extremes using Gaussian scale mixtures, has a breakdown of a censored copula likelihood.
+% Cite the papers on truncated Gaussian copulas for zero-inflated data: @article{chung2022phylogenetically,  title={Phylogenetically informed Bayesian truncated copula graphical models for microbial association networks},  author={Chung, Hee Cheol and Gaynanova, Irina and Ni, Yang},  journal={The Annals of Applied Statistics},  volume={16},  number={4}, pages={2437--2457},  year={2022},  publisher={Institute of Mathematical Statistics}}
+% and the initial truncated copula paper: @article{yoon2020sparse,  title={Sparse semiparametric canonical correlation analysis for data of mixed types},  author={Yoon, Grace and Carroll, Raymond J and Gaynanova, Irina},  journal={Biometrika},  volume={107},  number={3},  pages={609--625}, year={2020},  publisher={Oxford University Press}}
+
+As of now, using only our JGNM, we can forecast densities location-wise. Were we to aggregate these forecasts and look at them jointly over a region, we would observe blatant inconsistencies between locations. As motivated at the start of this section, we seek a way of imposing spatial dependence on our densities. Fortunately, the following result allows us to do just that.
+
+
+
+Sklar's theorem links the marginal and the joint PDFs together through the copula density, providing a means of getting information about one of these quantities by knowing the other two. In our case, to learn the joint density, what we are missing is the form of the copula $\mathbf{c}$. The trick to this estimation is to assume a known form for the copula $\mathbf{c}$ dependent on a set of parameters $\boldsymbol{\theta}$, thereby reducing the problem to an inference of $\boldsymbol{\theta}$.\par
+The standard choice in the literature is a Gaussian copula, as its properties are well studied and it has been shown to work well in a multitude of cases [source?]. It assumes that the desired copula $\mathbf{c}$ which models the density of transformed rainfall $\mathbf{u}_t$ is identical to the copula found by replacing the densities in equation (2) by standard Gaussians. That is:
+\begin{equation}
+    \mathbf{c}(u_{1,t}, \ldots , u_{n,t}) = \mathbf{c}(\Phi(x_{1,t}), \ldots , \Phi(x_{n,t})) = 
+    \frac{\Phi_{\boldsymbol\theta}(x_{1,t},\ldots, x_{n,t}) }{\prod_{i=1}^{n}\phi(x_{i,t})}
+\end{equation}
+ where $(x_{1,t} ,\ldots, x_{n,t}) \in \mathbb{R}^n$,  $\phi$ is the univariate standard Gausian density, $\Phi$ the univariate standard Gaussian distribution and $\Phi _{\boldsymbol\theta}$ the multivariate Gaussian distribution with mean $\mathbf{0}$ and covariance matrix $\Sigma_{\boldsymbol \theta}$ where the subscript indicates the dependence in the parameterisation. Due to this simplifying assumption, once $\boldsymbol\theta$ has been estimated, one can sample $\mathbf{u}_t$ as the transformed normal variables $\mathbf{x}_t=(x_{1,t}, \ldots, x_{n,t}) \sim \mathffrac{N}(\mathbf{0},\Sigma_{\boldsymbol\theta})$ by noticing that equation (3) implies $u_{i,t}=\Phi(x_{i,t})$. From there, it is only a matter of using inverse transformations to get rainfall samples as $F_{Y_{i,t}}^{-1}(u_{i,t})=y_{i,t}$. In essence, the inference task is to find $\boldsymbol\theta$ which best describes the dependence between locations implied by the covariance matrix $\Sigma_{\boldsymbol\theta}$ inside the copula density of $\mathbf{u}_{t}$. \par
+However, due to the zero-inflated nature of rainfall leading to our assumption of zero-Gamma mixtures for marginal densities, the symmetry of a Gaussian copula between low and high values of $\mathbf{u}_{t}$ is undesirable. That is because when applying the inversion probability transform on observed rainfall amounts $y_{i,j}$, any location with zero rainfall is mapped to $1-p_{i,t}$ (the point mass given to 0-valued realisations by the respective marginal). Consequentially, $\mathbf{u}_{t}$ is restricted to the $n$-dimensional space $\left[1-p_{1,t},1\right]\times \left[1-p_{2,t},1\right] \cdots \left[1-p_{n,t},1\right]$ $\subseteq \mathbb{N}^n$. This is exactly the set-up of censored observations with the censoring levels being given by $\{1-p_{i,t}\}_{i\in\mathcal{I}}$. The censoring effectively removes the symmetry of a standard Gaussian copula, and thus calls for a separate modelling approach.\par
+
+Wishing to retain the simplifying Gaussian assumption on the form of the copula, we need to modify the densities involved in equation (3) to take the censoring into account. By censoring them according to their respective censoring levels, the following definition ensues:
+
+\begin{definition}[Censored Gaussian Copula]
+Assume a vector-valued censored random variable $\mathbf{u}=(u_1,\ldots,u_n) $ along with censoring levels $\boldsymbol\gamma= (\gamma_1,\ldots,\gamma_n) $ such that \\$\gamma_i\leq u_i \leq 1 \quad \forall i \in \{1,\ldots n\}$. Then, the censored Gaussian copula for $\mathbf{u}$ is defined as
+\begin{equation}
+    \mathbf{c}(u_1, \ldots , u_n) = \mathbf{c}(H_1(x_{1}), \ldots , H_n(x_{n})) = 
+    \frac{\mathbf{H}_{\boldsymbol\theta}(x_{1},\ldots, x_{n}) }{
+    \prod_{i=1}^{n}h(x_{i})}
+\end{equation}
+where $H_i$ and $h_i$ are respectively the marginal distribution and density of $x_i$, $i\in\{1,\ldots,n\}$ and $\mathbf{H}_{\boldsymbol\theta}$ is the  
+
+\end{definition}
+
+\paragraph{Modeling of spatial dependency}For the spatial estimation problem, we only need to specify the form of the input distance matrix $\mathcal{D}$. In our case, a natural choice is to use the euclidean distance between locations as it reflects the problems geographical nature. However, using only distance, we find that the generated samples miss out on small-scale variations, as shown in figure [dist only vs obs]. To capture this variation, we include topographical information by considering a matrix of distances between geopotential heights of individual locations. The resulting distance matrix can be written as:
+$$
+\mathcal{D}= a \cdot D +(1-a)\cdot \frac{T}{70}
+$$
+where $D$ is the matrix of euclidean distances and $T$ is the matrix of topographical distances. The topographical matrix is divided by 70 to normalise it with the distance matrix $D$. The coefficient $a$ serves to adjust the relative importance of each matrix, where $a\to1$ makes the samples rely on geographical distances only while $a\to0$ makes the samples rely uniquely on topography. As we will see from the results, the estimation of $a$ is not straightforward. We therefore treat it more as a hyperparameter of our model and restrict its possible values to $[0.5,0.99]$ (More details in appendix to motivate this?).
+
+To apply our model to the rainfall dataset, we need to specify the marginal densities as well as the form of the distance matrix $\mathcal{D}$ used to construct the covariance in equation[].\\
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Sampled_and_obs_rain/20ytest_day213_obs.eps}
+    \caption{Observed rain}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Sampled_and_obs_rain/20ytest_day213_sims_l400_a0.9.eps}
+    \caption{Simulated rain with distance and topology}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Sampled_and_obs_rain/20ytest_day213_sims_l400_a1.eps}
+    \caption{Simulated rain with distance}
+    \end{subfigure}
+    \caption{\textbf{(a)} Observed rain on 30/01/2000 over all locations in the 20 year testing dataset. \textbf{(b)}  A sample of simulated rainfall for the same day using the Cens-JGNM with $l=400,\, a=0.9$ so as to include topographical information. \textbf{(c)} A sample of simulated rainfall for the same day using the Cens-JGNM with $l=400,\, a=1$ which only takes geographical distance into account.}
+    \label{fig:kernels_dist_topo}
+\end{figure}
+
+\subsection{Minimum scoring rule censored Gaussian copula}
+
+START BY DISCUSSING WHY MLE CAN"T BE COMPUTED.
+
+In order to infer our parameter vector of interest, we aim to optimise an objective function. From previous work on scoring rules (SR) [source], it is possible to use a strictly proper scoring rule as an objective in order to learn the parameters of a distribution. In our case, we need a SR which takes into account the spatial nature of the data. One such SR which can be used on spatial data is the Variogram score, written as:
+\begin{equation}
+S_{\mathrm{V}}\left(P_{\bm \theta}, \mathbf{x}\right):=
+\sum_{i, j=1}^d w_{i j}\left(\left|x_i-x_j\right| 
+-
+\mathbb{E}_{\mathbf{X}^{\prime} \sim P_{\bm \theta}}\left|X_{i}^{\prime}-X_{j}^{\prime}\right|\right)^2
+\end{equation}
+with $w_{ij}$ being the euclidian distance between locations $i$ and $j$.
+However, this SR is not strictly proper, and thus cannot be used as an objective on its own. Fortunately, as shown in [source], when combined with a strictly proper SR, the resulting SR is also strictly proper and usable as an objective. As such, we combine the Variogram with the energy score (written $S_{\mathrm{E}}\left(P_{\bm \theta}, \mathbf{x}\right)$) and use that as our objective total score (written $S_{\mathrm{T}}\left(P_{\bm \theta}, \mathbf{x}\right)$) :
+\begin{equation*}
+    S_{\mathrm{T}}\left(P_{\bm \theta}, \mathbf{x}\right) = 
+    \gamma_1 \cdot S_{\mathrm{V}}\left(P_{\bm \theta}, \mathbf{x}\right)
+    +
+    \gamma_2 \cdot S_{\mathrm{E}}\left(P_{\bm \theta}, \mathbf{x}\right)
+\end{equation*}
+\begin{equation}
+    =\gamma_1 \cdot \sum_{i, j=1}^d w_{i j}\left(\left|x_i-x_j\right| 
+-
+\mathbb{E}_{\mathbf{X}^{\prime} \sim P_{\bm \theta}}\left|X_{i}^{\prime}-X_{j}^{\prime}\right|\right)^2
+    +
+    \gamma_2 \cdot 2 \cdot \mathbb{E}_{\mathbf{X}^{\prime} \sim P_{\bm \theta}}\|\mathbf{X}^{\prime}-\mathbf{x}\|_2-\mathbb{E}_{\mathbf{X}_{1}^{\prime},\mathbf{X}_{2}^{\prime} \sim P_{\bm \theta}}\left\|\mathbf{X}^{\prime}_{1}-\mathbf{X}^{\prime}_{2}\right\|_2
+\end{equation}
+where $\gamma_1$ and $\gamma_2$ are coefficients in $\mathbb{R}$ chosen in order to ensure both SRs are of similar magnitude. With our objective defined this way, one only has to evaluate this expression over days in the training set and compare observed images of rainfall $\bm y$ to simulated rainfall images $\bm y^{\prime}$. However, one can consider transforming $(\bm y,\bm y^{\prime})$ to their counterparts $(\bm x,\bm x^{\prime})$ on a Gaussian scale. Doing so does not change the solution of our optimisation object since that transformation is a bijection. Indeed, having 
+\begin{equation}
+    x_i = \Phi^{-1}(u_i) = \Phi^{-1}(\text{CDF$_{\text{JGNM},i}$}(y))
+\end{equation}
+we see that this transformation is nothing but a composition of $\Phi^{-1}$ the inverse standard Gaussian CDF (censored at the appropriate level $d_i$ [need to write this better])and of the marginal CDFs, both of which are bijections themselves [true?]. (If $y_i=0$, then $u_i=1-p_i$ giving $x_i=d_i$ and if not, the transformations are monotonic increasing, ?) 
+\\
+In order to speed up computations, one can employ an approximation of (2) by sampling from the multivariate Gaussian with covariance matrix $\Sigma_{\bm \theta}$, which is shown to be unbiased in [ ]. The resulting objective is as follows (have to change to take locations into account, and change the letters used):
+\begin{equation}
+\hat{S_{\mathrm{T}}}\left(P_{\bm \theta}, \mathbf{x}\right)=
+    \sum_{i, j=1}^d w_{i j}\left(\left|y_i-y_j\right|^p-\frac{1}{m} \sum_{k=1}^m\left|x_{k, i}-x_{k, j}\right|^p\right)^2
+    +
+    \frac{2}{m} \sum_{j=1}^m\left\|\mathbf{x}_j-\mathbf{y}\right\|_2^\beta-\frac{1}{m(m-1)} \sum_{\substack{, k=1 \\ k \neq j}}^m\left\|\mathbf{x}_j-\mathbf{x}_k\right\|_2^\beta
+\end{equation}
+
+\subsection{Inference on simulated data}
+%\subsection{Simulated data - Inference of lengthscale}
+In order to empirically validate our estimation procedure, we generated fake data and attempted to recover the initial $\boldsymbol\theta$ values. We performed two such test: one with simple multivariate normal data and one with censored rainfall data.
+\textbf{Recovering $\boldsymbol\theta$ with multivariate Gaussian data}
+We impose $\boldsymbol\theta = (450,0.9)$
+COULD INCLUDE EXAMPLES OF SR WITH DIFFERENT BETAS etc to 
+
+Recovering $\boldsymbol\theta$ with simulated rainfall data
+We again impose $\boldsymbol\theta=(450,0.9)$, however this time we consider a subset of 400 locations from our UK rainfall dataset, as shown in figure[]. Next, we simulate 5000 Gaussian draws $\boldsymbol{x}'_{m}=(x'_{1,m},\ldots,x'_{400,m}) \quad m\in \{1,\ldots,5000\} $ from a $ \mathcal{N}(\boldsymbol{0}_{400},\Sigma_{\boldsymbol\theta}) $ where each $x'_{i,m}$ corresponds to location $i$ in the subset. Finally, we censor each  
+draw $\boldsymbol{x}'_{i,m}$ according to the JGNM-estimated censor levels (transformed to a Gaussian scale, as explained in subsection []) $d_{i,m} = \Phi^{-1}(1-p_{i,m}) $ of day $m$ at location $i$. In this manner, we get one draw of simulated rainfall per day over a 5000 day period, all according to our initial choice of $\boldsymbol\theta$.\\
+Then, the task is to follow the same estimation procedure as explained in subsection[] in order to infer and hopefully recover our parameters using this simulated data. Here, we evaluate the energy SR over all the 400 locations while still subsampling days in batches of 700 with 150 draws for the stochastic SR estimate. We ran dual\_annealing for a total of 52000 SR evaluations.
+
+In figure[theta vs SR], we show the lengthscale plotted against the SR estimate. In order to reduce the variance of the SR estimates, we perform k-nn averaging with $k=300$ over candidate $\boldsymbol\theta$ values. One can see the clear curvature of the lengthscale with an arch around the desired value, indicating that we indeed recover the correct lengthscale.\\
+
+
+ADD BOTH SIMULATION HERE AND FIGURE TOGETHER BELOW! 
+
+ADD THE FIGURE OF SUBLOCATIONS, MAYBE MAKE IT SMALLER, OR ZOOM IN.
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Fake_data/SR_lscale_fakedata.eps}
+    \caption{Gaussian copula}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Fake_data/SR_lscale_fakedata.eps}
+    \caption{Censored Gaussian copula}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Fake_data/sub_locs.eps}
+    \caption{Subset of locations}
+    \end{subfigure}
+    \caption{\textbf{ ??} Lengthscale plotted against SR estimates using k-nn with $n=300$ (a) Gaussian copula and (b) censored Gaussian copula (c) subset of locations considered.}
+    \label{fig:compare_benchmark_roc_auc}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Real Data Scenario}
+To demonstrate the effectiveness of our proposed procedure, we apply it to the rainfall dataset presented in section []. Furthermore, we compare our model against competing benchmark and study the effect of a reduced training sample. We will evaluate the performance of the models with the help of the following diagnostics. 
+NOTE: theta values for exp: 20y[400,0.9] ,10y[450,0.9], 8y[455,0.9], 6y[480,0.9], 4y[510,0.9]\par
+
+NOTE2: Cens-JGNM/ConvCNP: 500 days, all locs, 100 sims. Exceptions: histrank-all obs. Variogram-25 sims, roc-all data. 
+
+
+Firstly, we seek to verify the accuracy of our models daily estimated probabilities for a given amount of rainfall compared to the observed amount. To achieve this, we assess the sensitivity of the detection of heavy precipitation. We convert our forecasting task into a classification task by asking the following question: “Will there be precipitation exceeding a given amount?” The answer to this question will depend on a probability threshold, which our model has to surpass in order to emit a signal, or rather, give a positive answer to the question. This threshold $\tau$ is subjective and can be chosen as any value in [0, 1].\\
+For a given threshold, a test that correctly predicts heavy rain (as in rain exceeding a given amount) is known as a true positive. But if the test predicts heavy rain on a day it did not occur, this is known as a false positive.
+By treating precipitation at each day and point in space as separate independent events, a true positive rate (the proportion of points and days with heavy rain which was correctly detected) and the false positive rate (the proportion of points and days with no heavy rain with a positive signal) can be obtained.\\
+In order to detect heavy rain, we compare the threshold $\tau$ with $1 − F_{i,t}(q)$, that is
+1 minus the CDF for location i at time t evaluated at the heavy rain value $q \in \mathbb{R}_{\geq0}$.
+The higher the value of $\tau$ , the more mass under the PDF on the right of $q$ we need
+in order to be confident enough to issue a positive signal. On the contrary, assuming
+$\tau = 0$, we then classify all forecasts irrespective of location, time or predictors as a
+positive.\\
+By changing this threshold $\tau$ , we can construct a receiver operating characteristic
+(ROC) curve plotting the true and false positive rates at each of these thresholds.
+Different levels of precipitation $q$ can be tested, for example, 5 mm for light rain up
+to 25 mm for extreme events. The area under the ROC curve (AUC) can be used
+to assess how well the prediction for different levels of precipitation in the face of
+uncertainty was captured by the model []. The closer the AUC gets to 1, the more
+confidence we can have in the heavy rainfall prediction capabilities of the examined
+model.\par
+
+Next, we tests whether the estimated frequency of a type of event (eg. precipitation $> x$) over the testing period has matched with the observed frequency. The estimated frequency of achieving a rainfall realisation above a level $x \in \mathbb{R}_{\geq 0}$ is obtained by generating samples from our model and looking at the proportion of samples exceeding $x$. This is then compared to the actual observation frequencies for values higher than $x$. A well-calibrated models sample frequency should follow the observation line closely, while a poorly calibrated model will deviate significantly from it. We refer to these plots as empirical cumulative distribution funciton (ecdf) plots. \par
+
+To further assess the calibration of our model we construct rank histograms. By sampling $m$ times from our model, we can obtain an empirical distribution $\hat{F}_{i,t}$ for day $t$ and location $i$. Then, we can estimate $F^{-1}_{i,t}( y_{i,t})$ as $\hat{F}_{i,t}( y_{i,t}) = \sum_{k=1}^{m} \mathds{1}\{  y_{i,t} >  y_{i,t}^{(k)} \} $, that is the quantile of the observed rainfall with respect to our models simulations $\{ y_{i,t}^{(k)}:k \in \{1,\ldots,m\}\}$. We refer to one such quantile as the rank of $ y_{i,t}$. By obtaining the rank of observations across days, we can construct a histogram of ranks. If the model is perfectly calibrated, the ranks will be uniformly distributed on $[0,1]$, as should be the case for a CDF of its own realisations. We can assess properties of our model by inspecting the dissimilarities of the histogram to a flat line [rank hist soure]. For instance, if the model is over-dispersed, the ranks will tend to group in the middle while under-dispersion will manifest itself as most ranks falling within the extremes of the histogram. Equally, one can determine bias of the model by observing unequal proportions of ranks on either side of the histogram, where an agglomeration on the right is indicative of under-prediction while agglomeration on the left indicates over-prediction.\par
+
+To explicitly show the spatial coherence of forecasts we produce cross-correlation plots. These consider the pair-wise correlation between all locations and the center of mass of the UK. We compare the observed cross-correlation against the sampled cross-correlation across all days. The ideal forecast would have a perfectly matching sample cross-correlation plot with the observed one.
+
+We also rely on numerical metrics to evaluate the effectiveness of our approach. Firstly, we consider the continuous ranked probability score (CRPS) [source], written as
+\begin{equation}
+    \operatorname{CRPS}(F_{i,t}, y_{i,t})=-\int_{-\infty}^{\infty}(F(y_{i,t}^{'})-\mathbf{1}\{y_{i,t}^{'} \geq y_{i,t}\})^2 \mathrm{~d} y_{i,t}^{'}
+\end{equation}
+which can be shown [source] to be equal to
+\begin{equation}
+    \operatorname{CRPS}(F_{i,t}, y_{i,t})=\frac{1}{2} E_{Y_1,Y_2\sim F_{i,t}}\left|Y_1-Y_2\right|-E_{Y\sim F_{i,t}}|Y-y_{i,t}|.
+\end{equation}
+The above expectations can be estimated without bias through repeated sampling from the model. The CRPS is a generalisation of the mean absolute error and indeed simplifies to it when considering a model with point-wise predictions. This metric is applied location-wise and favors well-calibrated forecasts.\par
+
+Next, we use the Energy and Variogram scores. The Energy score and its merits are discussed in section []. To specifically target the spatial coherence of our model, we resort to the Variogram score, written as:
+
+\begin{equation}
+    S_{\mathrm{v}}^{(p)}\left(\mathbf{F}_{t}, \mathbf{y}_{t}\right):=\sum_{k, l=1}^m w_{kl}\left(\left|y_{k,t}-y_{l,t}\right|^p-\mathbb{E}_{\mathbf{Y} \sim \mathbf{F}_{t}}\left|Y_{k,t}-Y_{l,t}\right|^p\right)^2.
+\end{equation}
+Again, we can resort to repeated sampling in order to estimate the expectation. We take $p=1$ for simplicity. The weights $w_{kl}$ are chosen to represent the spatial nature of the problem. As such, we choose $w_{k,l}$ to be 1 over the distance from location $k$ to $l$ and setting $w_{kk}=0$. This score takes into account the whole joint distribution and compares the smoothness of observed data against that of model forecasts. An ideal forecast would have a Variogram score of zero.
+
+Finally, we assess the models performances by two quantitative metrics:  the root mean squared bias (RMSB) and mean absolute bias (MAB). In order to compute these quantities, we need to convert our probabilistic forecasts into point-forecasts. We do this by relying on the median of $m$ forecasts for any given place and time. We can then compute the two metrics as:
+$$
+\mathrm{RMSB}=\sqrt{\frac{1}{n \times T} \sum_{i=1}^{n} \sum_{t=1}^{T}\left(y_{i,t}-\widehat{y}_{i,t}\right)^{2}}, \quad \mathrm{MAB}=\frac{1}{n \times T} \sum_{i=1}^{n} \sum_{t=1}^{T}\left|y_{i,t}-\widehat{y}_{i,t}\right|
+$$
+where $\widehat{y}_{i,t}$ is the median for time $t$ and location $i$, $y_{i,t}$ is the equivalent realisation of rainfall and $T$ is the total number of days considered. 
+
+
+
+\subsection{Comparison with benchmark algorithms}
+
+We begin by comparing our method to two competing benchmark methods, namely the VAE-GAN[] and the ConvCNP[]. Both these models as well as our own were fitted to 20 years of data, from 1997 to 1993 on the whole of the UK. We then compare their forecasting capabilities on another 20 years of data, from 1999 to 2019.\par
+
+We begin by looking at the ROC and AUC in fig[ROC AUC].
+
+Next, in figure are show the rank histograms and ECDFs of the three models. The VAE-GAN has the poorest performance on the rank histograms. It presents clear signs of under-dispersion with a large number of observations falling close to 0 and 1. The ConvCNP and our model have very similar histograms. This is not too surprising when taking into account the similarity in the assumptions on marginal densities. Both models fit closely to the ideal which is indicative of correct calibration. There is a slight under-representatoin of values near 1, implying a slight bias in the forecasts towards higher values than those in the test dataset.\\
+The ECDF in figure[ECDF] shows the match between observed and sampled frequencies. Our model, the Cens-JGNM has the closest fit the the target line, suggesting it has the best calibration out of the three models.\par
+
+Figure [corr map] shoes the cross-correlations of locations. The ConvCNP has close to 0 correlation across all locations. This expected due to its lack of explicit spatial modelling; sampling is done marginally, without taking other locations into consideration. The VAE-GAN performs slightly better, making some correlation apparent in location close to the center. Finally, the Cens-JGNM shows a clear dependence between locations, mimicking the observed cross-correlation map. This figure exemplifies the effectiveness of the Cens-JGNM at capturing spatial dependence with the distance matrix $\mathcal{D}$.
+
+Finally, we show numeric metrics in table[]. 
+
+PUT THE ROCs in Appendix
+
+\begin{comment}
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/20y/roc_20y.png}
+    \caption{Cens-JGNM}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/ConvCNP/roc_convCNP.png}
+    \caption{ConvCNP}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/VAEGAN/VAEGAN_roc_sims.eps}
+    \caption{VAE-GAN}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/combind_AUC_3models.eps}
+    \caption{Comparison of AUC}
+    \end{subfigure}
+    \caption{\textbf{ ??} ROC curves for (a) Cens-JGNM, (b) ConvCNP and (c) VAE-GAN; and comparison of AUC in (d).}
+    \label{fig:compare_benchmark_roc_auc}
+\end{figure}
+
+\end{comment}
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/combind_AUC_3models.eps}
+         \caption{Area under the curve (AUC)}
+        \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/combind_rank_hist_zoomed.eps}
+         \caption{Rank histogram (cut the axis)}
+         \end{subfigure}
+    %\begin{subfigure}{0.49\textwidth}
+    %     \includegraphics[width= \textwidth]{Figures/Combined/combind_rank_hist_logged.eps}
+    %\caption{Rank histogram logged}
+    %\end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/Combined_ecdf.eps}
+    \caption{ECDF}
+    \end{subfigure}
+    \caption{\textbf{ ??} (a) AUC, (b) Rank histograms show the rank of observations against simulated samples for all three models. (b) we show the frequency of rainfall amounts in observed data and simulated data from the three models.}
+    \label{fig:compare_benchmark_rnkhist_ecdf}
+\end{figure}
+
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/20y/obs_corr_20ytest_JGNM.eps}
+    \caption{Observed}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/20y/sims_corr_20ytest_JGNM.eps}
+    \caption{Censored JGNM}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/ConvCNP/convCNP_corr_sims.eps}
+    \caption{ConvCNP}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/VAEGAN/VAEGAN_corr_sims.eps}
+    \caption{VAE GAN}
+    \end{subfigure}
+    \caption{\textbf{ ??} ((a) Observed, (b) Cens-JFNM, (c) ConvCNP and (d) VAEGAN. Spatial correlation maps for the 20 years testing set of the three models. The correlation is measured with respect to the center of mass indicated by the dotted lines. The left column shows the correlation over the whole period of observed data, the right column shows the correlation of 25 generated samples over a subsample of 500 days and the last column shows the median of those samples over the same 500 day period.}
+    \label{fig:comapre_model_spatil_crosscorr}
+\end{figure}
+
+\paragraph{Spatial Coherence ..} 
+
+Here we study spatial cross-correlation .... and energy and variogram score. .. 
+
+
+\vspace{1cm}
+\begin{tabular}{ |p{3cm}||p{3cm}|p{3cm}|p{3cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{Diagnostic Metrics} \\
+ \hline
+ Model & Cens-JGNM & ConvCNP & VAEGAN \\
+ \hline
+ CRPS   & \textbf{1.1613}    & 1.6536 &   4.5059\\
+ Energy Score&   \textbf{2.6184}  & 3.1003   &3.2127\\
+ Variogram Score & \textbf{2,949,584} & 7,914,394 &  9,841,903\\
+ RMSB & \textbf{3.8642} & 4.3073 &  4.8861\\
+ MAB & \textbf{1.839}  & 3.0266 & 1.9865\\
+
+ \hline
+\end{tabular}
+
+
+
+\subsection{\textbf{Robustness} on length of training dataset}
+In addition to comparing our approach against benchmarks, we appraise the robustness of the Cens-JGNM to reduced amounts of data. We train a Cens-JGNM on increasingly smaller samples of data to then compare the resulting forecasts on the same test data. There are four models in total, the most restrained one fitted on 2 years of data (01/1987 to 12/1988), then one with 4 years of data (01/1985 to 08/1988), 6 years (1983 to 10/1987) and finally 10 years (1979 to 07/1986). All are tested on the same 30 years of data, from 07/1989 to 07/2019. We use the same diagnostics as above with the goal of determining whether or not the performance of our models suffers in settings with a lack of data.
+
+We begin by inspecting the ROCs and AUCs. From figure[ROC AUC] one can see there is no real change in the metrics between different sample sizes. All four models are better calibrated for lower rainfall events, however, the difference is not drastic.\par
+
+We also compare their rank histograms in figure [rank hists].\par
+
+From figure[ecdf] where we show the effect of reduced sample size on calibration, ..\par
+
+To assess the spatial dependence of the models, cross-correlation plots are shown in figure[corr]. All four models capture well the spatial structure in their forecasts, with no clear trend with respect to training size. the performance from frigure[corr 20y] seems to be matched even with reduced data. \par
+
+Finally, in table[], we compare the metrics of the four models.  \par
+
+
+RANK HISTOGRAM, ECDF, TABLE!
+
+\vspace{1cm}
+\begin{tabular}{ |p{3cm}||p{2.25cm}|p{2.25cm}|p{2.25cm}|p{2cm}|  }
+ \hline
+ \multicolumn{5}{|c|}{Diagnostic Metrics for probabilistic forecasting} \\
+ \hline
+ Metric & 4 years & 6 years & 8 years & 10 years\\
+ \hline
+ CRPS   & 1.2640    & 1.2301 &   \textbf{1.178} & 1.3449\\
+ Energy Score&   2.6026  & \textbf{2.5669}   & 2.5693 & 2.6757\\
+ Variogram Score & \textbf{3,856,752}  & 7005992 &  7027719 & 7793053\\
+ RMSB    & 4.0971 & 4.0882 &  4.1642 & \textbf{3.9889}\\
+ MAB&   1.928  & 1.9795 & \textbf{1.735} & 2.107\\
+
+ \hline
+\end{tabular}
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/robustness_auc.eps}
+    \caption{AUC}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/robustness_rank_hist_.eps}
+    \caption{Rank Histogram}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/Combined/robustness_ecdf.eps}
+    \caption{ECDF - wrong figure as spaceblocker}
+    \end{subfigure}
+    \caption{\textbf{Robustness:} The (a) AUC, (b) rank histogram and (c) ecdf plotted against the rainfall levels for the Cens-JGNM model trained (including validation) on different periods of data.}
+    \label{fig:robustness_cross_corr}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.8\textwidth}
+         \includegraphics[width= \textwidth]{Figures/4y/obs_corr_4ytest.eps}
+    \caption{Observed}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/10y/sims_corr_10ytest.eps}
+    \caption{10 years}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/8y/sims_corr_8ytest.eps}
+    \caption{8 years}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/6y/sims_corr_6ytest.eps}
+    \caption{6 years}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/4y/sims_corr_4ytest.eps}
+    \caption{4 years}
+    \end{subfigure}
+    \caption{\textbf{Robustness:} Correlation maps for different training periods of our Cens-JGNM model. The correlation is measured with respect to the center of mass indicated by the dotted lines. The left column shows the correlation over the whole period of observed data, the right column shows the correlation of 25 generated samples over a subsample of 500 days and the last column shows the median of those samples over the same 500 day period.}
+    \label{fig:robustness_cross_corr}
+\end{figure}
+
+\section{Related Works}
+In order to gain a grasp of possible avenues for model assumptions, it is meaningful to first consider related work.\par
+\paragraph{Markovian models}
+In \cite{paper9}, the three authors consider a non-homogeneous hidden markov model for rainfall. Faced with high resolution predictors in the form of weather variables and tasked with predicting rain on a finer spatial grid, the authors assume that predictors can be classified into a small number of (unobserved) discrete patterns called weather states. These states are assumed to follow a Markov chain of which transition probabilities are given by the current observable characteristics of the atmosphere. Then, precipitation is assumed to be generated independently of time upon conditioning on these weather states. \par
+
+This Markovian  assumption has been a popular method for modelling rainfall. In \cite{paper10}, a paper on Generalised Linear Models (GLMs) used for rainfall forecasting, the authors discuss and compare an array of models one could use. The overarching principle of these models however, is that they too assume a Markov structure for rainfall. More precisely, here the authors model the rainfall amount itself using rainfall observations from the preceding day as predictors, and consider future rain to be independent of past information given the current rainfall observation. The authors assume multiple setups where they model $p$, $f$, neither or both with different specifications of GLMs with the use of appropriate link functions. They show that GLMs can be used successfully for rainfall models, notably with a Bernoulli-Gamma mixture or as ensembles, and recommend their use for site-specific density forecasting.\par
+
+\paragraph{Compound-Poisson models}
+Compound-Poisson (CP) models, in the context of rainfall, model the total amount accumulated over a given period of time, such as a day. Instead of asking the question "How much did it rain yesterday?", these models ask "How many times did rainfall occur yesterday, and how much did it rain during each of those occurrences?". By decomposing the modelling problem into two parts, namely occurrences and amounts per occurrence, this model can forecast zero rain if the number of future occurrences is zero. For rainfall forecasting, such models have been used in the past \cite{paper15} and continue to be studied and applied successfully to this day \cite{paper5}. 
+
+\paragraph{Regression models}
+Other approaches have also been considered. As presented in \cite{paper11}, PCA regression can be used to get downscaled (that is over a finer grid of locations) rainfall levels by using CM variables together with mean sea level pressure (MSLP) measurements. Making use of the strong association between MSLP and rainfall, the authors fitted a model on Australian rainfall by performing PCA regression on different CM outputs. Their resulting model alleviates the underprediction problems that CMs face by yielding, on average, estimates closer to actual rainfall observations.\par
+
+Quantile regression can also be used for precipitation modelling. In \cite{paper12}, the authors show how one can determine the daily conditional distributions for rainfall given a set of CM forecasts to use as predictors. Using quantile regression has the advantage of avoiding the assumption of normally distributed errors. It also allows great flexibility in the choice of predictors as different subsets of variables can be used for different parts of the predictive distribution. They apply this methodology to Canadian rain, showing that their model outperforms conventional regression models for summer rainfall and matches them for the winter season.  
+
+\paragraph{Deep Learning models}
+With the fairly recent advances in Deep Learning (DL) methods, new opportunities arise for these types of models to be fitted to different sorts of datasets. In \cite{paper6}, expanding on previous DL models applied to rainfall forecasting such as \cite{paper13} and \cite{paper14}, the authors achieved state-of-the-art performance in point-wise prediction. The model, named TRU-NET, is using data comparable to a climate models output to train a novel encoder-decoder model with a loss function specifically designed to deal with the zero-inflated nature of rainfall data. More recently, in \cite{Anna_conv} the authors present a convolutional based downscaling model for local temperature and precipitation prediction. They also include topographical information in their prediction process, to yield competitive forecasts for both mean and extreme metrics. 
+These works showed that with the right approach, DL methods can be used to model rainfall conditionally on climate model forecasts of weather variables and thus achieve excellent results for future precipitation forecasts.\par  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion} blah blah
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Single Appendix:                         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{appendix}
+%\section*{???}%% if no title is needed, leave empty \section*{}.
+%\end{appendix}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Multiple Appendixes:                     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{appendix}
+%\section{???}
+%
+%\section{???}
+%
+\section{NN for marginals}
+Implementation-wise, the JGNM operates on 6-hourly low resolution model fields $ \mathcal{Z}_s \in \mathbb{R}^{4 {\times} 20 {\times} 21 {\times} 6}$ to output the set of 3 target variables $\mu_t,\phi_t,\rho_t \in \mathbb{R}^{100 {\times} 140}$, which parameterise predictive distributions for daily total rainfall for a 28-day period. Here the subscript $s$ indicates the 6-hourly units of time as opposed to the daily subscript $t$.
+
+Similar to the approach in [TRUNET], we initially use bi-linear interpolation to map the weather variables from a ${20 {\times} 21}$ grid to a ${100 {\times} 140}$ grid. Then, for separate ${16 {\times} 16}$ spatial subsections of the interpolated grid, we pass the 6-hourly data of all 6 weather variables. This results in our input being of dimension 
+(28$\cdot$4${\times}$16${\times}$16${\times}$6) represented by the matrices $\boldsymbol{x}_s$ with $s\in\{1,\ldots,112\}$ in Figure [NN diagram].
+
+Next, a Time Distributed 2D Convolution Layer (TD2L) is used to transform each $\boldsymbol{x}_s$ to a hidden representation where, importantly, the layer applies the same instance of a 2D Convolutional unit to each time-wise unit of a temporal sequence. In our setting the channel dimension of the hidden representation $d$ is 64 such that $ TD2L(\mathcal{X}_s) \rightarrow {h}^{TD2L}_s \in \mathbb{R}*{28\cdot4{\times}16{\times}16{\times}64)}$.
+% , where $\mathcal{h}^{\text{name}}$ is the output of the layer named $\text{\name}$.
+
+The stacked Convolutional LSTM (CLSTM) \citep{ConvLSTM_shi} layers contains a stack of 2 bi-directional CLSTM layers. Skip connections are employed between successive layers. The outputs from the backward and forward CLSTM units are combined through concatenation. We provide further information about the Convolutional LSTM in Appendix~\ref{apdx:ConvLSTM}. In our experiments the Conv-LSTM layers have input dropouts of 0.25 and recurrent dropouts of 0.35.
+
+The Time Distributed Temporal Downscaling Layer (TDTD) performs temporal downscaling on the output of the stacked Conv-LSTM. Specifically, the CLSTM output ${h}_{s}$, $s \in\{1,\ldots,112\}$, is transformed from a sequence of 112 tensors to 28 tensors representing a shift from a 6 hourly information set to a daily information set $\boldsymbol{h}_t$, $t\in\{1,\ldots,28\}$. In this case the time-distributed operation is implemented by performing the same downscaling operation on non-overlapping groups of 4 sequential ${h}_{s}$.
+
+% We use convolutional multi-head self-attention (MHSA) in order to capture the notion that the hidden representation chosen for ${h}_t$ should be a weighted aggregation of the 4 corresponding $h_s{[i:i+4]}$). Self attention allows us to the weights to be variable and dependent on the weather properties expressed by each of the hidden representations in $h_s$(-IDK-$\in[i:i+4]$). The multi-head part ensures that we can base the weight calculation on multiple properties instead of just one.
+
+We use convolutional multi-head self-attention (MHSA) in order to capture the notion that the hidden representation chosen to represent the one time period at a coarser time resolution, should be a dynamically weighted aggregation of hidden representations corresponding to the same time step but at a finer resolution. The multi-head part ensures that we can base the weight calculation on multiple properties instead of just one.
+
+We provide an explanation of convolution multi-head self-attention in the appendix \ref{apdx:ConvMHSA}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/Pictures from Akanni/Model.drawio.png}
+    \caption{NeuralTGLM architecture. This figure depicts our triple output Neural GLM model, which outputs parameters for a 3-parameter distribution. We use it to parameterize predictive $Hurdle(\mu_i,\phi_i,\rho_i)$ distributions and predictive $Tweedie(\mu_i,\phi_i,\rho_t)$ distributions for the rain fall over 28 consecutive days. The Sequence Length of 3D tensors between layers is contracted in the Time Distributed Temporal Downscaling Layer (TDTD), as our input has a 6 hour frequency, while the output is daily.}
+\end{figure}
+
+\section{ROC for experiments}
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/VAEGAN/VAEGAN_roc_sims.eps}
+    \caption{VAE-GAN}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/ConvCNP/ROC_Convcnp_20y_all_test.eps}
+    \caption{ConvCNP}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/20y/ROC_JGNM_20y_all_test.eps}
+    \caption{Cens-JGNM}
+    \end{subfigure}
+
+    \caption{\textbf{Bechmarking} ROC for 3 models.}
+    \label{fig:robustness_cross_corr}
+\end{figure}
+
+
+
+\begin{figure}[h!]
+\centering
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/10y/ROC_10y_all.eps}
+    \caption{10 Years}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/8y/ROC_8y_all.eps}
+    \caption{8 years}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/6y/ROC_6y_all.eps}
+    \caption{6 years}
+    \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+         \includegraphics[width= \textwidth]{Figures/4y/ROC_4y_all.eps}
+    \caption{4 years}
+    \end{subfigure}
+    \caption{\textbf{Robustness:} ROC for robustness 4,6,8,10 years.}
+    \label{fig:robustness_cross_corr}
+\end{figure}
+
+
+
+
+\end{appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Support information, if any,             %%
+%% should be provided in the                %%
+%% Acknowledgements section.                %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{acks}[Acknowledgments]
+% The authors would like to thank ...
+%\end{acks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Funding information, if any,             %%
+%% should be provided in the                %%
+%% funding section.                         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{funding}
+% The first author was supported by ...
+%
+% The second author was supported in part by ...
+%\end{funding}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Supplementary Material, including data   %%
+%% sets and code, should be provided in     %%
+%% {supplement} environment with title      %%
+%% and short description. It cannot be      %%
+%% available exclusively as external link.  %%
+%% All Supplementary Material must be       %%
+%% available to the reader on Project       %%
+%% Euclid with the published article.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{supplement}
+%\stitle{???}
+%\sdescription{???.}
+%\end{supplement}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                  The Bibliography                       %%
+%%                                                         %%
+%%  imsart-nameyear.bst  will be used to                   %%
+%%  create a .BBL file for submission.                     %%
+%%                                                         %%
+%%  Note that the displayed Bibliography will not          %%
+%%  necessarily be rendered by Latex exactly as specified  %%
+%%  in the online Instructions for Authors.                %%
+%%                                                         %%
+%%  MR numbers will be added by VTeX.                      %%
+%%                                                         %%
+%%  Use \cite{...} to cite references in text.             %%
+%%                                                         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% if your bibliography is in bibtex format, uncomment commands:
+%\bibliographystyle{imsart-nameyear} % Style BST file
+%\bibliography{References.bib}       % Bibliography file (usually '*.bib')
+
+\bibliographystyle{abbrvnat}
+\bibliography{References.bib}
+
+%% or include bibliography directly:
+% \begin{thebibliography}{}
+% \bibitem[\protect\citeauthoryear{???}{???}]{b1}
+% \end{thebibliography}
+
+\end{document}
